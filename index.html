@@ -10,29 +10,35 @@
 				width: 100vw;
 				background-image: linear-gradient(to bottom, red, yellow);
 			}
-			.current-button{
-				text-decoration: underline;
-            }
-            .navigation-button {
+			.navigation-button {
 				border: 3px solid black;
 				font-size: 50px;
 				font-family: "Modak", system-ui;
 				font-weight: 400;
 				font-style: normal;
 				background-color: transparent;
+				cursor: pointer;
 			}
 			#navigation {
 				border: 3px solid black;
 				display: flex;
 				justify-content: space-evenly;
 				width: 60vw;
+				position: relative;
+			}
+			#underline {
+				position: absolute;
+				bottom: 10px;
+				height: 3px;
+				background-color: white;
+				transition: all 0.3s ease;
 			}
 			#page-container {
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 			}
-			#rat-trap-description {
+			#subpage {
 				border: 3px solid black;
 				width: 60vw;
 				font-size: 2rem;
@@ -40,6 +46,8 @@
 				font-optical-sizing: auto;
 				font-style: normal;
 				font-variation-settings: "wdth" 100;
+				padding: 20px;
+				box-sizing: border-box;
 			}
 			body {
 				background-color: black;
@@ -93,31 +101,9 @@
 					Zarezerwuj
 				</button>
 				<button id="contact" class="navigation-button">Kontakt</button>
+				<div id="underline"></div>
 			</div>
-			<div id="rat-trap-description">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-				commodo dolor vitae odio pellentesque, sit amet mollis lacus
-				pharetra. Morbi lobortis, leo a scelerisque suscipit, libero
-				nisi volutpat odio, sit amet mollis leo erat non turpis. Mauris
-				pharetra diam metus, vel gravida leo finibus eget. Sed laoreet
-				dolor a massa rhoncus ultricies. Morbi condimentum risus sed
-				lorem tincidunt, in fermentum ex feugiat. Mauris consectetur
-				fermentum lacinia. Vivamus dignissim eu sem vitae facilisis. Nam
-				quis neque auctor, bibendum elit at, ultricies lorem. Sed nec
-				ipsum vel dui tempor sagittis pharetra id diam. Nullam gravida
-				efficitur magna sit amet varius. Phasellus scelerisque, elit ut
-				vestibulum cursus, risus quam auctor dolor, quis posuere nisi
-				sapien non ligula. Ut eros nunc, faucibus vel tortor non,
-				tincidunt sagittis massa. Vivamus auctor efficitur pretium. Sed
-				pharetra porta massa. In nec ante vehicula, pharetra lorem eu,
-				facilisis turpis. Nulla non hendrerit magna, et mollis justo.
-				Pellentesque convallis, erat vel consectetur tempor, risus neque
-				mattis est, eu tristique elit mauris rutrum justo. Vivamus non
-				libero quis tortor vehicula gravida. Praesent eleifend ipsum sit
-				amet maximus bibendum. Sed porta est sed eros laoreet eleifend.
-				Morbi at orci a urna hendrerit varius. Nam orci dolor, feugiat a
-				lobortis in, aliquam.
-			</div>
+			<div id="subpage"></div>
 		</div>
 	</body>
 	<script src="index.js"></script>
