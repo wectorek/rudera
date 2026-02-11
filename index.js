@@ -1,3 +1,12 @@
+const reservation={
+	name:"",	
+	email:"",
+	phone:"",
+	checkIn:"",
+	checkOut:"",
+	guests:1,
+	specialRequests:""
+}
 const subpages = {
 	foresterDescription: "foresterDescription",
 	areaDescription: "areaDescription",
@@ -58,9 +67,22 @@ const subpageContent = {
 		<p>Odpisujemy na wiadomości w ciągu 24 godzin.</p>
 	`,
 };
-let currentSubpage = subpages.foresterDescription;
+// Funkcja do pobierania parametru z URL
+function getPageFromURL() {
+	const urlParams = new URLSearchParams(window.location.search);
+	const page = urlParams.get('page');
+	// Sprawdź czy parametr page jest poprawny
+	if (page && Object.values(subpages).includes(page)) {
+		return page;
+	}
+	return subpages.foresterDescription; // Domyślna strona
+}
+
+let currentSubpage = getPageFromURL();
 let currentButton = document.getElementById(currentSubpage);
-currentButton.classList.add("current-button");
+if (currentButton) {
+	currentButton.classList.add("current-button");
+}
 const areaDescriptionButton = document.getElementById(subpages.areaDescription);
 const foresterDescriptionButton = document.getElementById(
 	subpages.foresterDescription,
@@ -69,7 +91,7 @@ const foresterDescriptionButton = document.getElementById(
 const bookingButton = document.getElementById(subpages.booking);
 const contactButton = document.getElementById(subpages.contact);
 
-function showSubpage(subpage) {
+function showSubpage(subpage, updateURL = true) {
 	currentButton.classList.remove("current-button");
 	currentButton = subpage;
 	currentButton.classList.add("current-button");
@@ -84,10 +106,26 @@ function showSubpage(subpage) {
 	underline.style.left = rect.left - navRect.left + "px";
 	underline.style.width = rect.width + "px";
 
-	// Zmień zawartość podstrony
 	const subpageElement = document.getElementById("subpage");
+	const supbageBookingElement = document.getElementById("supbageBooking");
 	const subpageId = currentButton.id;
-	subpageElement.innerHTML = subpageContent[subpageId];
+
+	// Aktualizuj URL
+	if (updateURL) {
+		const newURL = `${window.location.pathname}?page=${subpageId}`;
+		window.history.pushState({ page: subpageId }, '', newURL);
+	}
+
+	// Jeśli kliknięto booking, pokaż div supbageBooking i ukryj subpage
+	if (subpageId === "booking") {
+		subpageElement.style.display = "none";
+		supbageBookingElement.style.display = "block";
+	} else {
+		// Dla innych przycisków pokaż subpage i ukryj supbageBooking
+		subpageElement.style.display = "block";
+		supbageBookingElement.style.display = "none";
+		subpageElement.innerHTML = subpageContent[subpageId];
+	}
 }
 for (const button of [
 	areaDescriptionButton,
@@ -102,5 +140,22 @@ for (const button of [
 
 // Inicjalizacja pozycji linii przy starcie
 window.addEventListener("load", () => {
-	showSubpage(currentButton);
+	showSubpage(currentButton, false); // false = nie aktualizuj URL przy inicjalizacji
+});
+
+// Obsługa przycisku "wstecz" i "dalej" w przeglądarce
+window.addEventListener('popstate', (event) => {
+	if (event.state && event.state.page) {
+		const button = document.getElementById(event.state.page);
+		if (button) {
+			showSubpage(button, false);
+		}
+	} else {
+		// Jeśli nie ma state, sprawdź URL
+		const page = getPageFromURL();
+		const button = document.getElementById(page);
+		if (button) {
+			showSubpage(button, false);
+		}
+	}
 });

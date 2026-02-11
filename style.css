@@ -1,0 +1,201 @@
+@import url("https://fonts.googleapis.com/css2?family=Modak&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
+
+#main-image {
+	width: 100vw;
+	background-image: linear-gradient(to bottom, red, yellow);
+}
+
+.navigation-button {
+	border: 3px solid black;
+	font-size: 50px;
+	font-family: "Modak", system-ui;
+	font-weight: 400;
+	font-style: normal;
+	background-color: transparent;
+	cursor: pointer;
+}
+
+#navigation {
+	border: 3px solid black;
+	display: flex;
+	justify-content: space-evenly;
+	width: 60vw;
+	position: relative;
+}
+
+#underline {
+	position: absolute;
+	bottom: 10px;
+	height: 3px;
+	background-color: white;
+	transition: all 0.3s ease;
+}
+
+#page-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#subpage {
+	border: 3px solid black;
+	width: 60vw;
+	font-size: 2rem;
+	font-family: "Zalando Sans", sans-serif;
+	font-optical-sizing: auto;
+	font-style: normal;
+	font-variation-settings: "wdth" 100;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+body {
+	background-color: black;
+	margin: 0;
+}
+
+* {
+	color: white;
+}
+
+.img-wrap {
+	position: relative;
+	display: inline-block;
+}
+
+.img-wrap img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.img-wrap::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to top, rgb(0, 0, 0), rgba(0, 0, 0, 0));
+	pointer-events: none;
+}
+
+form input,
+form textarea,
+form select {
+	color: black;
+}
+
+.form-group {
+	margin-bottom: 25px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 1.1rem;
+	font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="date"],
+.form-group input[type="number"] {
+	width: 100%;
+	padding: 12px 15px;
+	font-size: 1rem;
+	border: 2px solid #444;
+	border-radius: 8px;
+	box-sizing: border-box;
+	background-color: #1a1a1a;
+	color: white;
+	transition: all 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="tel"]:focus,
+.form-group input[type="date"]:focus,
+.form-group input[type="number"]:focus {
+	outline: none;
+	border-color: #888;
+	background-color: #2a2a2a;
+}
+
+.form-section {
+	margin-bottom: 35px;
+	padding-bottom: 25px;
+	border-bottom: 1px solid #333;
+}
+
+.form-section:last-of-type {
+	border-bottom: none;
+}
+
+.form-section h3 {
+	margin-top: 0;
+	margin-bottom: 20px;
+	font-size: 1.5rem;
+	color: #fff;
+}
+
+.checkbox-group {
+	margin-bottom: 15px;
+	display: flex;
+	align-items: center;
+}
+
+.checkbox-group input[type="checkbox"] {
+	width: 20px;
+	height: 20px;
+	margin-right: 12px;
+	cursor: pointer;
+}
+
+.checkbox-group label {
+	font-size: 1rem;
+	margin: 0;
+	cursor: pointer;
+}
+
+.submit-btn {
+	width: 100%;
+	padding: 18px;
+	font-size: 1.3rem;
+	font-weight: 600;
+	color: white;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.submit-btn:active {
+	transform: translateY(0);
+}
+
+#bookingForm h2 {
+	margin-top: 0;
+	margin-bottom: 30px;
+	font-size: 2.5rem;
+	text-align: center;
+	color: #fff;
+}
+
+#supbageBooking {
+	border: 3px solid black;
+	width: 60vw;
+	font-size: 2rem;
+	font-family: "Zalando Sans", sans-serif;
+	font-optical-sizing: auto;
+	font-style: normal;
+	font-variation-settings: "wdth" 100;
+	padding: 20px;
+	box-sizing: border-box;
+	display: none;
+}
