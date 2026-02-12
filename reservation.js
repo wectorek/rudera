@@ -1,4 +1,4 @@
-class Reservation {
+export class Reservation {
 	constructor(data) {
 		// Planowany czas pobytu
 		this.arrivalDate = data.arrivalDate;
@@ -21,7 +21,30 @@ class Reservation {
 			email: data.email,
 		};
 	}
-	calculateNumberOfNights() {
+	
+    toPlainObject() {
+        return {
+            arrivalDate: this.arrivalDate,
+            departureDate: this.departureDate,
+            numberOfGuests: this.numberOfGuests,
+            numberOfNights: this.calculateNumberOfNights(),
+            attractions: {
+                bikeRental: this.attractions.bikeRental,
+                kayakRental: this.attractions.kayakRental,
+                campfire: this.attractions.campfire,
+                pets: this.attractions.pets
+            },
+            contact: {
+                firstName: this.contact.firstName,
+                lastName: this.contact.lastName,
+                phone: this.contact.phone,
+                email: this.contact.email
+            },
+            totalPrice: this.calculateTotalPrice(),
+        };
+    }
+    
+    calculateNumberOfNights() {
 		if (this.arrivalDate && this.departureDate) {
 			const arrival = new Date(this.arrivalDate);
 			const departure = new Date(this.departureDate);

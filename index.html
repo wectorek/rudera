@@ -150,14 +150,16 @@
 							Zarezerwuj pobyt
 						</button>
 					</form>
-					
-					<div id="reservationSummary" style="display: none;">
+
+					<div id="reservationSummary" style="display: none">
 						<h2>Potwierdzenie rezerwacji</h2>
-						
+
 						<div class="summary-section">
 							<h3>Dane rezerwacji</h3>
 							<div class="summary-item">
-								<span class="summary-label">Data przyjazdu:</span>
+								<span class="summary-label"
+									>Data przyjazdu:</span
+								>
 								<span id="summaryCheckIn"></span>
 							</div>
 							<div class="summary-item">
@@ -177,11 +179,13 @@
 								<span id="summaryAttractions"></span>
 							</div>
 						</div>
-						
+
 						<div class="summary-section">
 							<h3>Dane kontaktowe</h3>
 							<div class="summary-item">
-								<span class="summary-label">Imię i nazwisko:</span>
+								<span class="summary-label"
+									>Imię i nazwisko:</span
+								>
 								<span id="summaryName"></span>
 							</div>
 							<div class="summary-item">
@@ -193,12 +197,61 @@
 								<span id="summaryPhone"></span>
 							</div>
 						</div>
-						
+
 						<div class="summary-section price-section">
 							<h3>Estymowana cena</h3>
 							<div class="summary-item price-item">
-								<span class="summary-label">Całkowity koszt:</span>
-								<span id="summaryPrice" class="price-value"></span>
+								<span class="summary-label"
+									>Całkowity koszt:</span
+								>
+								<span
+									id="summaryPrice"
+									class="price-value"
+								></span>
+							</div>
+						</div>
+
+						<div class="summary-section">
+							<h3>Link do rezerwacji</h3>
+							<div class="summary-item">
+								<div class="reservation-link-container">
+									<input
+										type="text"
+										id="reservationLink"
+										readonly
+										class="reservation-link-input"
+									/>
+									<button
+										id="copyLinkBtn"
+										class="copy-btn"
+										title="Kopiuj link"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<rect
+												x="9"
+												y="9"
+												width="13"
+												height="13"
+												rx="2"
+												ry="2"
+											></rect>
+											<path
+												d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+											></path>
+										</svg>
+										<span id="copyFeedback"></span>
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -206,6 +259,5 @@
 			</div>
 		</div>
 	</body>
-	<script src="reservation.js"></script>
-	<script src="index.js"></script>
-</html>
+<script type="module" src="reservation.js"></script>
+<script type="module" src="index.js"></script>
