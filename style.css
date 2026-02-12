@@ -199,3 +199,61 @@ form select {
 	box-sizing: border-box;
 	display: none;
 }
+
+#reservationSummary {
+	padding: 20px;
+}
+
+#reservationSummary h2 {
+	margin-top: 0;
+	margin-bottom: 30px;
+	font-size: 2.5rem;
+	text-align: center;
+	color: #fff;
+}
+
+.summary-section {
+	margin-bottom: 35px;
+	padding-bottom: 25px;
+	border-bottom: 1px solid #333;
+}
+
+.summary-section:last-of-type {
+	border-bottom: none;
+}
+
+.summary-section h3 {
+	margin-top: 0;
+	margin-bottom: 20px;
+	font-size: 1.5rem;
+	color: #fff;
+}
+
+.summary-item {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 15px;
+	font-size: 1.1rem;
+}
+
+.summary-label {
+	font-weight: 500;
+	color: #ccc;
+}
+
+.price-section {
+	background: rgba(102, 126, 234, 0.1);
+	border-radius: 10px;
+	padding: 20px;
+	border: 2px solid #667eea;
+}
+
+.price-item {
+	font-size: 1.5rem;
+	font-weight: 600;
+}
+
+.price-value {
+	color: #667eea;
+	font-size: 2rem;
+}

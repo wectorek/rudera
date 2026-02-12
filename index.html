@@ -150,9 +150,62 @@
 							Zarezerwuj pobyt
 						</button>
 					</form>
+					
+					<div id="reservationSummary" style="display: none;">
+						<h2>Potwierdzenie rezerwacji</h2>
+						
+						<div class="summary-section">
+							<h3>Dane rezerwacji</h3>
+							<div class="summary-item">
+								<span class="summary-label">Data przyjazdu:</span>
+								<span id="summaryCheckIn"></span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-label">Data wyjazdu:</span>
+								<span id="summaryCheckOut"></span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-label">Liczba nocy:</span>
+								<span id="summaryNights"></span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-label">Liczba osób:</span>
+								<span id="summaryGuests"></span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-label">Atrakcje:</span>
+								<span id="summaryAttractions"></span>
+							</div>
+						</div>
+						
+						<div class="summary-section">
+							<h3>Dane kontaktowe</h3>
+							<div class="summary-item">
+								<span class="summary-label">Imię i nazwisko:</span>
+								<span id="summaryName"></span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-label">Email:</span>
+								<span id="summaryEmail"></span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-label">Telefon:</span>
+								<span id="summaryPhone"></span>
+							</div>
+						</div>
+						
+						<div class="summary-section price-section">
+							<h3>Estymowana cena</h3>
+							<div class="summary-item price-item">
+								<span class="summary-label">Całkowity koszt:</span>
+								<span id="summaryPrice" class="price-value"></span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</body>
+	<script src="reservation.js"></script>
 	<script src="index.js"></script>
 </html>

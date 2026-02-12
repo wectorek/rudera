@@ -1,12 +1,4 @@
-const reservation={
-	name:"",	
-	email:"",
-	phone:"",
-	checkIn:"",
-	checkOut:"",
-	guests:1,
-	specialRequests:""
-}
+
 const subpages = {
 	foresterDescription: "foresterDescription",
 	areaDescription: "areaDescription",
@@ -158,4 +150,45 @@ window.addEventListener('popstate', (event) => {
 			showSubpage(button, false);
 		}
 	}
+});
+
+// Obsługa formularza rezerwacji
+document.addEventListener('DOMContentLoaded', () => {
+    const bookingForm = document.getElementById('bookingForm');
+    
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Zapobiega przeładowaniu strony
+            
+            // Pobierz wartości z formularza
+            const formData = new FormData(bookingForm);
+            
+            // Utwórz obiekt z wszystkimi danymi
+            const reservationData = {
+                // Planowany czas pobytu
+                arrivalDate: formData.get('checkIn'),
+                departureDate: formData.get('checkOut'),
+                numberOfGuests: parseInt(formData.get('guests')),
+                
+                // Dodatkowe atrakcje
+                bikeRental: formData.get('bikeRental') === 'on',
+                kayakRental: formData.get('kayakRental') === 'on',
+                campfire: formData.get('campfire') === 'on',
+                pets: formData.get('pets') === 'on',
+                
+                // Dane kontaktowe
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                phone: formData.get('phone'),
+                email: formData.get('email')
+            };
+            
+            // Utwórz obiekt rezerwacji
+            const reservation = new Reservation(reservationData);
+            
+            // Wywołaj metodę wyświetlającą podsumowanie
+            reservation.showSummary();
+          
+        });
+    }
 });

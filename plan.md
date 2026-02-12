@@ -2,6 +2,9 @@ To do:
 
 - Interfejs rezerwacji
   - Kalendarz
+  - Interfejs stworzonej rezerwacji
+    - Dane wpisane do rezerwacji
+    - Estymowana cena
   - Dane wejściowe:
     - Planowany czas pobytu (Date)
     - Liczba osób (Number)
