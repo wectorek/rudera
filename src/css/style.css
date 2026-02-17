@@ -1,5 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Modak&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
 
+#map {
+    height: 100%;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 #main-image {
 	width: 100vw;
 	background-image: linear-gradient(to bottom, red, yellow);
