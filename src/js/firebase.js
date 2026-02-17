@@ -4,7 +4,7 @@ import {
 	collection,
 	addDoc,
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
+import { APIKey } from "./firebaseAPIKey.js";
 
 const firebaseConfig = {
 	apiKey: APIKey,

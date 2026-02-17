@@ -273,12 +273,12 @@ form select {
 	border-radius: 8px;
 	background-color: rgba(102, 126, 234, 0.1);
 	color: #fff;
-	font-family: 'Courier New', monospace;
+	font-family: "Courier New", monospace;
 }
 
 .reservation-link-input:focus {
 	outline: none;
-	border-color: #4CAF50;
+	border-color: #4caf50;
 }
 
 .copy-btn {
