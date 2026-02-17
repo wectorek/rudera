@@ -1,5 +1,4 @@
-import { addDocument } from "./firebase.js";
-import { loadReservation } from "./functions.js";
+import { addDocument } from "./apis/firebase/firebase.js";
 
 export class Reservation {
 	constructor(data) {
@@ -114,58 +113,111 @@ export class Reservation {
 			this.calculateTotalPrice() + " zł";
 	}
 
-	static initBookingForm() {
-		document.addEventListener("DOMContentLoaded", () => {
-			const bookingForm = document.getElementById("bookingForm");
+	static getReservationIdFromURL() {
+		const urlParams = new URLSearchParams(window.location.search);
+		return urlParams.get("reservationId");
+	}
 
-			if (bookingForm) {
-				bookingForm.addEventListener("submit", async (event) => {
-					event.preventDefault(); // Zapobiega przeładowaniu strony
+	static async loadReservation(reservationId) {
+		try {
+			const { getDoc, doc } = await import(
+				"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js"
+			);
+			const { db } = await import("./apis/firebase/firebase.js");
 
-					// Pobierz wartości z formularza
-					const formData = new FormData(bookingForm);
+			const reservationRef = doc(db, "reservations", reservationId);
+			const reservationSnap = await getDoc(reservationRef);
 
-					// Utwórz obiekt z wszystkimi danymi
-					const reservationData = {
-						// Planowany czas pobytu
-						arrivalDate: formData.get("checkIn"),
-						departureDate: formData.get("checkOut"),
-						numberOfGuests: parseInt(formData.get("guests")),
+			if (reservationSnap.exists()) {
+				const data = reservationSnap.data();
+				console.log("Dane rezerwacji:", data);
 
-						// Dodatkowe atrakcje
-						bikeRental: formData.get("bikeRental") === "on",
-						kayakRental: formData.get("kayakRental") === "on",
-						campfire: formData.get("campfire") === "on",
-						pets: formData.get("pets") === "on",
+				// Utwórz obiekt rezerwacji z pobranych danych
+				const reservationData = {
+					arrivalDate: data.arrivalDate,
+					departureDate: data.departureDate,
+					numberOfGuests: data.numberOfGuests,
+					bikeRental: data.attractions.bikeRental,
+					kayakRental: data.attractions.kayakRental,
+					campfire: data.attractions.campfire,
+					pets: data.attractions.pets,
+					firstName: data.contact.firstName,
+					lastName: data.contact.lastName,
+					phone: data.contact.phone,
+					email: data.contact.email,
+				};
 
-						// Dane kontaktowe
-						firstName: formData.get("firstName"),
-						lastName: formData.get("lastName"),
-						phone: formData.get("phone"),
-						email: formData.get("email"),
-					};
+				const reservation = new Reservation(reservationData);
+				reservation.showSummary();
 
-					// Utwórz obiekt rezerwacji
-					const reservation = new Reservation(reservationData);
-
-					// Zapisz rezerwację do bazy i otrzymaj ID
-					const docRef = await addDocument(
-						reservation.toPlainObject(),
-					);
-					const reservationId = docRef.id;
-
-					// Zaktualizuj URL z parametrem reservationId
-					const newURL = `${window.location.pathname}?page=booking&reservationId=${reservationId}`;
-					window.history.pushState(
-						{ page: "booking", reservationId: reservationId },
-						"",
-						newURL,
-					);
-
-					// Załaduj rezerwację z bazy
-					loadReservation(reservationId);
-				});
+				// Wypełnij link do rezerwacji
+				const reservationLinkInput =
+					document.getElementById("reservationLink");
+				if (reservationLinkInput) {
+					const reservationUrl = `${window.location.origin}${window.location.pathname}?page=booking&reservationId=${reservationId}`;
+					reservationLinkInput.value = reservationUrl;
+				}
+			} else {
+				console.error("Rezerwacja nie istnieje");
+				alert("Nie znaleziono rezerwacji o podanym ID");
 			}
-		});
+		} catch (error) {
+			console.error("Błąd podczas pobierania rezerwacji:", error);
+			alert("Wystąpił błąd podczas pobierania danych rezerwacji");
+		}
+	}
+
+	static initBookingForm() {
+		const bookingForm = document.getElementById("bookingForm");
+
+		if (bookingForm) {
+			bookingForm.addEventListener("submit", async (event) => {
+				event.preventDefault(); // Zapobiega przeładowaniu strony
+
+				// Pobierz wartości z formularza
+				const formData = new FormData(bookingForm);
+
+				// Utwórz obiekt z wszystkimi danymi
+				const reservationData = {
+					// Planowany czas pobytu
+					arrivalDate: formData.get("checkIn"),
+					departureDate: formData.get("checkOut"),
+					numberOfGuests: parseInt(formData.get("guests")),
+
+					// Dodatkowe atrakcje
+					bikeRental: formData.get("bikeRental") === "on",
+					kayakRental: formData.get("kayakRental") === "on",
+					campfire: formData.get("campfire") === "on",
+					pets: formData.get("pets") === "on",
+
+					// Dane kontaktowe
+					firstName: formData.get("firstName"),
+					lastName: formData.get("lastName"),
+					phone: formData.get("phone"),
+					email: formData.get("email"),
+				};
+
+				// Utwórz obiekt rezerwacji
+				const reservation = new Reservation(reservationData);
+
+				// Zapisz rezerwację do bazy i otrzymaj ID
+				const docRef = await addDocument(
+					reservation.toPlainObject(),
+				);
+				const reservationId = docRef.id;
+				console.log("RESERVATION CREATED: " + reservationId);
+
+				// Zaktualizuj URL z parametrem reservationId
+				const newURL = `${window.location.pathname}?page=booking&reservationId=${reservationId}`;
+				window.history.pushState(
+					{ page: "booking", reservationId: reservationId },
+					"",
+					newURL,
+				);
+
+				// Załaduj rezerwację z bazy
+				Reservation.loadReservation(reservationId);
+			});
+		}
 	}
 }
