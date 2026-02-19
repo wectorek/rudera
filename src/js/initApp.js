@@ -6,6 +6,7 @@ export function initApp() {
 		areaDescription: "areaDescription",
 		booking: "booking",
 		contact: "contact",
+		myReservation: "myReservation",
 	};
 
 	let currentSubpage = getPageFromURL(subpages);
@@ -22,12 +23,14 @@ export function initApp() {
 
 	const bookingButton = document.getElementById(subpages.booking);
 	const contactButton = document.getElementById(subpages.contact);
+	const myReservationButton = document.getElementById(subpages.myReservation);
 
 	for (const button of [
 		areaDescriptionButton,
 		foresterDescriptionButton,
 		bookingButton,
 		contactButton,
+		myReservationButton,
 	]) {
 		button.addEventListener("click", async () => {
 			currentButton = await showSubpage(button, currentButton);

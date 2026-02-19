@@ -90,14 +90,27 @@ export async function showSubpage(
 		// Inicjalizuj formularz rezerwacji przy pierwszym wejściu
 		if (!bookingFormInitialized) {
 			Reservation.initBookingForm();
-			initCopyButton();
 			bookingFormInitialized = true;
 		}
+	} else if (subpageId === "myReservation") {
+		subpageElement.style.display = "none";
+		supbageBookingElement.style.display = "block";
 
-		// Sprawdź czy jest reservationId w URL
-		const reservationId = Reservation.getReservationIdFromURL();
+		// Świeża kopia — reset widoku
+		const response = await fetch("pages/myReservation.html");
+		supbageBookingElement.innerHTML = await response.text();
+		initCopyButton();
+
+		// Reset flag — booking musi załadować się od nowa po powrocie
+		bookingContentLoaded = false;
+		bookingFormInitialized = false;
+
+		const { auth } = await import("../apis/firebase/firebase.js");
+		const reservationId = new URLSearchParams(window.location.search).get("reservationId");
 		if (reservationId) {
 			Reservation.loadReservation(reservationId);
+		} else if (auth.currentUser) {
+			Reservation.loadMyReservations(auth.currentUser.uid);
 		}
 	} else {
 		// Dla innych przycisków pokaż subpage i ukryj supbageBooking
