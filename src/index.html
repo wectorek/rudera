@@ -5,8 +5,59 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Rudera</title>
 		<link rel="stylesheet" href="css/style.css" />
-	</head>
+		<script src="https://accounts.google.com/gsi/client" async defer></script>
+		<script>
+			const CLIENT_ID =
+				"";
+			const SCOPES = "https://www.googleapis.com/auth/gmail.send";
 
+			let accessToken = null;
+
+			function initClient() {
+				google.accounts.oauth2
+					.initTokenClient({
+						client_id: CLIENT_ID,
+						scope: SCOPES,
+						redirect_uri: window.location.origin,
+						callback: (tokenResponse) => {
+							accessToken = tokenResponse.access_token;
+							sendEmail();
+						},
+					})
+					.requestAccessToken();
+			}
+
+			function sendEmail() {
+				const email = [
+					"To: test@example.com",
+					"Subject: Test Gmail API",
+					"",
+					"To jest testowa wiadomość.",
+				].join("\n");
+
+				const encodedEmail = btoa(unescape(encodeURIComponent(email)))
+					.replace(/\+/g, "-")
+					.replace(/=+$/, "");
+
+				fetch(
+					"https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+					{
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${accessToken}`,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							raw: encodedEmail,
+						}),
+					},
+				)
+					.then((res) => res.json())
+					.then((data) => console.log("Wysłano:", data))
+					.catch((err) => console.error(err));
+			}
+		</script>
+	</head>
 	<body>
 		<div id="map"></div>
 
@@ -21,13 +72,29 @@
 			<div id="auth-status"></div>
 			<div id="navigation">
 				<button id="login" class="navigation-button">Zaloguj</button>
-				<button id="logout" class="navigation-button" style="display:none">Wyloguj</button>
-				<button id="myReservation" class="navigation-button" style="display:none">Moja rezerwacja</button>
+				<button
+					id="logout"
+					class="navigation-button"
+					style="display: none"
+				>
+					Wyloguj
+				</button>
+				<button
+					id="myReservation"
+					class="navigation-button"
+					style="display: none"
+				>
+					Moja rezerwacja
+				</button>
 				<button id="foresterDescription" class="navigation-button">
 					Opis leśniczówki
 				</button>
-				<button id="areaDescription" class="navigation-button">
-					Opis okolicy
+				<button
+					id="areaDescription"
+					class="navigation-button"
+					onclick="initClient()"
+				>
+					Gmail
 				</button>
 				<button id="booking" class="navigation-button">
 					Zarezerwuj
@@ -85,6 +152,7 @@
 			})({ key: "", v: "weekly" });
 		</script>
 	</body>
+
 	<script type="module" src="js/reservation.js"></script>
 	<script type="module" src="js/index.js"></script>
 </html>
