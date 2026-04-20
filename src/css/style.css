@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Modak&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Modak&family=Noto+Sans+Linear+A&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
 
 /* #map {
     height: 100%;
@@ -9,11 +9,14 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+    font-family: "Noto Sans Linear A", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 #auth-status {
 	padding: 6px 14px;
-	font-family: Roboto, sans-serif;
+	font-family: "Noto Sans Linear A", sans-serif;
 	font-size: 0.85rem;
 	color: #555;
 	text-align: right;
@@ -25,20 +28,72 @@ body {
 }
 
 .navigation-button {
-	border: 3px solid black;
-	font-size: 50px;
-	font-family: "Modak", system-ui;
+	border: none;
+	font-size: 0.9rem;
+	font-family: "Noto Sans Linear A", sans-serif;
 	font-weight: 400;
 	font-style: normal;
 	background-color: transparent;
 	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 10px 16px;
+	white-space: nowrap;
+}
+
+.navigation-button i {
+	font-size: 1.3rem;
+}
+
+#navbar {
+	width: 100%;
+	background-color: 
+	#0d305a;
+	border: none;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	justify-content: space-between;
+	box-sizing: border-box;
+}
+
+#navbar-left {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+#navbar-right {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding-right: 20px;
+	gap: 4px;
+}
+
+#user-display {
+	font-family: "Noto Sans Linear A", sans-serif;
+	font-size: 0.9rem;
+	color: white;
+	padding: 0 12px;
+}
+
+#navbar-title {
+	font-family: "Noto Sans Linear A", sans-serif;
+	font-size: 2.5rem;
+	font-weight: 400;
+	letter-spacing: 2px;
+	padding: 12px 0 4px 20px;
+	color: white;
 }
 
 #navigation {
-	border: 3px solid black;
+	border: none;
 	display: flex;
-	justify-content: space-evenly;
-	width: 60vw;
+	justify-content: flex-start;
+	width: auto;
 	position: relative;
 }
 
@@ -60,7 +115,7 @@ body {
 	border: 3px solid black;
 	width: 60vw;
 	font-size: 2rem;
-	font-family: "Zalando Sans", sans-serif;
+	font-family: "Noto Sans Linear A", sans-serif;
 	font-optical-sizing: auto;
 	font-style: normal;
 	font-variation-settings: "wdth" 100;
@@ -230,7 +285,7 @@ form select {
 	border: 3px solid black;
 	width: 60vw;
 	font-size: 2rem;
-	font-family: "Zalando Sans", sans-serif;
+	font-family: "Noto Sans Linear A", sans-serif;
 	font-optical-sizing: auto;
 	font-style: normal;
 	font-variation-settings: "wdth" 100;
@@ -312,7 +367,7 @@ form select {
 	border-radius: 8px;
 	background-color: rgba(102, 126, 234, 0.1);
 	color: #fff;
-	font-family: "Courier New", monospace;
+	font-family: "Noto Sans Linear A", sans-serif;
 }
 
 .reservation-link-input:focus {
@@ -451,4 +506,92 @@ form select {
 #backToList:hover {
 	color: #fff;
 	border-color: #667eea;
+}
+
+/* ===== Availability Bar ===== */
+
+#availability-bar {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	background-color: #0a2440;
+	padding: 12px 20px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+#availability-bar input {
+	font-family: "Noto Sans Linear A", sans-serif;
+	font-size: 1rem;
+	padding: 12px 15px;
+	border: 1px solid #444;
+	border-right: none;
+	background-color: #1a1a1a;
+	color: white;
+	outline: none;
+}
+
+#availability-bar input:first-child {
+	border-radius: 8px 0 0 8px;
+}
+
+#availability-bar input:last-of-type {
+	border-right: 1px solid #444;
+}
+
+#availability-bar button {
+	font-family: "Noto Sans Linear A", sans-serif;
+	font-size: 1rem;
+	padding: 12px 20px;
+	background-color: #1a56a0;
+	color: white;
+	border: none;
+	border-radius: 0 8px 8px 0;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+#availability-bar button:hover {
+	background-color: #2468c0;
+}
+
+/* ===== Booking Form Step 1 - Inline Inputs ===== */
+
+.availability-bar-inline {
+	display: flex;
+	align-items: flex-end;
+	gap: 0;
+}
+
+.availability-bar-inline .form-group {
+	margin-bottom: 0;
+	flex: 1;
+}
+
+.availability-bar-inline .form-group label {
+	margin-bottom: 4px;
+	font-size: 0.9rem;
+}
+
+.availability-bar-inline .form-group input {
+	border-radius: 0;
+	border-right: none;
+}
+
+.availability-bar-inline .form-group:first-child input {
+	border-radius: 8px 0 0 8px;
+}
+
+.availability-bar-inline .form-group:last-of-type input {
+	border-right: 2px solid #444;
+}
+
+.availability-bar-inline .submit-btn {
+	border-radius: 0 8px 8px 0;
+	white-space: nowrap;
+	margin: 0;
+	width: auto;
+	height: fit-content;
+	padding: 12px 20px;
+	font-size: 1rem;
 }

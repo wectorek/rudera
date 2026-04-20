@@ -58,18 +58,27 @@ logoutBtn.onclick = async () => {
 
 onAuthStateChanged(auth, (user) => {
 	const authStatus = document.getElementById("auth-status");
+	const userDisplay = document.getElementById("user-display");
 	if (user) {
 		console.log("Zalogowano:", user.displayName);
 		console.log("Email:", user.email);
 		console.log("UID:", user.uid);
 		console.log("Zdjęcie:", user.photoURL);
-		authStatus.textContent = `Zalogowano jako: ${user.email}`;
+		if (authStatus) authStatus.textContent = "";
+		if (userDisplay) {
+			userDisplay.textContent = user.displayName || user.email;
+			userDisplay.style.display = "";
+		}
 		loginBtn.style.display = "none";
 		logoutBtn.style.display = "";
 		document.getElementById("myReservation").style.display = "";
 	} else {
 		console.log("Użytkownik wylogowany");
-		authStatus.textContent = "";
+		if (authStatus) authStatus.textContent = "";
+		if (userDisplay) {
+			userDisplay.textContent = "";
+			userDisplay.style.display = "none";
+		}
 		loginBtn.style.display = "";
 		logoutBtn.style.display = "none";
 		document.getElementById("myReservation").style.display = "none";

@@ -16,7 +16,7 @@ async function loadSubpageContent(subpageId) {
 	}
 
 	// Załaduj z pliku w folderze pages
-	const response = await fetch(`pages/${subpageId}.html`);
+	const response = await fetch(`src/pages/${subpageId}.html`);
 	const html = await response.text();
 	
 	// Zapisz w cache
@@ -62,7 +62,7 @@ export async function showSubpage(
 	currentButton,
 	updateURL = true,
 ) {
-	currentButton.classList.remove("current-button");
+	if (currentButton) currentButton.classList.remove("current-button");
 	const newButton = subpage;
 	newButton.classList.add("current-button");
 
@@ -97,7 +97,7 @@ export async function showSubpage(
 		supbageBookingElement.style.display = "block";
 
 		// Świeża kopia — reset widoku
-		const response = await fetch("pages/myReservation.html");
+		const response = await fetch("src/pages/myReservation.html");
 		supbageBookingElement.innerHTML = await response.text();
 		initCopyButton();
 
@@ -123,4 +123,39 @@ export async function showSubpage(
 	}
 
 	return newButton;
+}
+
+export function initAvailabilityBar() {
+	const btn = document.getElementById("checkAvailability");
+	if (!btn) return;
+
+	btn.addEventListener("click", async () => {
+		console.log("Sprawdzanie dostępności...");
+		const checkIn = document.getElementById("quickCheckIn").value;
+		const checkOut = document.getElementById("quickCheckOut").value;
+		const guests = document.getElementById("quickGuests").value;
+
+		if (!checkIn || !checkOut || !guests) {
+			alert("Wypełnij wszystkie pola.");
+			return;
+		}
+
+		// Załaduj formularz rezerwacji bezpośrednio
+		const subpageElement = document.getElementById("subpage");
+		const supbageBookingElement = document.getElementById("supbageBooking");
+		subpageElement.style.display = "none";
+		supbageBookingElement.style.display = "block";
+
+		await loadBookingContent();
+		if (!bookingFormInitialized) {
+			Reservation.initBookingForm();
+			bookingFormInitialized = true;
+		}
+
+		// Przepisz wartości i pokaż krok 2
+		document.getElementById("checkIn").value = checkIn;
+		document.getElementById("checkOut").value = checkOut;
+		document.getElementById("guests").value = guests;
+		document.getElementById("bookingStep2").style.display = "block";
+	});
 }

@@ -1,4 +1,4 @@
-import { initApp } from "./initApp.js";
+import { initApp } from "../pages/initApp.js";
 let map
 initApp();
 async function initMap() {

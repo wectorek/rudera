@@ -1,10 +1,9 @@
-import { getPageFromURL, showSubpage } from "./helpers/page.js";
+import { getPageFromURL, showSubpage, initAvailabilityBar } from "../js/helpers/page.js";
 
 export function initApp() {
 	const subpages = {
 		foresterDescription: "foresterDescription",
 		areaDescription: "areaDescription",
-		booking: "booking",
 		contact: "contact",
 		myReservation: "myReservation",
 	};
@@ -21,14 +20,12 @@ export function initApp() {
 		subpages.foresterDescription,
 	);
 
-	const bookingButton = document.getElementById(subpages.booking);
 	const contactButton = document.getElementById(subpages.contact);
 	const myReservationButton = document.getElementById(subpages.myReservation);
 
 	for (const button of [
 		areaDescriptionButton,
 		foresterDescriptionButton,
-		bookingButton,
 		contactButton,
 		myReservationButton,
 	]) {
@@ -44,6 +41,7 @@ export function initApp() {
 			currentButton,
 			false,
 		); // false = nie aktualizuj URL przy inicjalizacji
+		initAvailabilityBar();
 	});
 
 	// Obsługa przycisku "wstecz" i "dalej" w przeglądarce

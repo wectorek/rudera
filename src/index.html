@@ -4,11 +4,12 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Rudera</title>
-		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="src/css/style.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 		<script src="https://accounts.google.com/gsi/client" async defer></script>
 		<script>
 			const CLIENT_ID =
-				"";
+				"302980156761-rkn7e1pdcnm5hp3k2bq5jqqftogqdo38.apps.googleusercontent.com";
 			const SCOPES = "https://www.googleapis.com/auth/gmail.send";
 
 			let accessToken = null;
@@ -18,7 +19,6 @@
 					.initTokenClient({
 						client_id: CLIENT_ID,
 						scope: SCOPES,
-						redirect_uri: window.location.origin,
 						callback: (tokenResponse) => {
 							accessToken = tokenResponse.access_token;
 							sendEmail();
@@ -29,7 +29,7 @@
 
 			function sendEmail() {
 				const email = [
-					"To: test@example.com",
+					"To: robczek@onet.pl",
 					"Subject: Test Gmail API",
 					"",
 					"To jest testowa wiadomość.",
@@ -61,47 +61,51 @@
 	<body>
 		<div id="map"></div>
 
-		<div id="page-container">
-			<div class="img-wrap">
-				<img
-					src="resources/panoraman.jpeg"
-					alt="Italian Trulli"
-					id="main-image"
-				/>
+		<div id="navbar">
+			<div id="navbar-left">
+				<div id="navbar-title">rudera.com</div>
+				<div id="navigation">
+					<button
+						id="myReservation"
+						class="navigation-button"
+						style="display: none"
+					>
+						<i class="fas fa-calendar-check"></i>Moja rezerwacja
+					</button>
+					<button id="foresterDescription" class="navigation-button">
+						<i class="fas fa-house"></i>Opis leśniczówki
+					</button>
+					<button
+						id="areaDescription"
+						class="navigation-button"
+						onclick="initClient()"
+					>
+						<i class="fas fa-envelope"></i>Gmail
+					</button>
+					<button id="contact" class="navigation-button"><i class="fas fa-phone"></i>Kontakt</button>
+					<div id="underline"></div>
+				</div>
 			</div>
-			<div id="auth-status"></div>
-			<div id="navigation">
-				<button id="login" class="navigation-button">Zaloguj</button>
+			<div id="navbar-right">
+				<button id="login" class="navigation-button"><i class="fas fa-right-to-bracket"></i>Zaloguj</button>
 				<button
 					id="logout"
 					class="navigation-button"
 					style="display: none"
 				>
-					Wyloguj
+					<i class="fas fa-right-from-bracket"></i>Wyloguj
 				</button>
-				<button
-					id="myReservation"
-					class="navigation-button"
-					style="display: none"
-				>
-					Moja rezerwacja
-				</button>
-				<button id="foresterDescription" class="navigation-button">
-					Opis leśniczówki
-				</button>
-				<button
-					id="areaDescription"
-					class="navigation-button"
-					onclick="initClient()"
-				>
-					Gmail
-				</button>
-				<button id="booking" class="navigation-button">
-					Zarezerwuj
-				</button>
-				<button id="contact" class="navigation-button">Kontakt</button>
-				<div id="underline"></div>
+				<span id="user-display" style="display: none;"></span>
 			</div>
+		</div>
+		<div id="availability-bar">
+			<input type="date" id="quickCheckIn" />
+			<input type="date" id="quickCheckOut" />
+			<input type="number" id="quickGuests" min="1" max="5" value="1" />
+			<button id="checkAvailability">Sprawdź dostępność</button>
+		</div>
+		<div id="page-container">
+			<div id="auth-status"></div>
 			<div id="subpage"></div>
 			<div id="subpages">
 				<div id="supbageBooking"></div>
@@ -153,6 +157,6 @@
 		</script>
 	</body>
 
-	<script type="module" src="js/reservation.js"></script>
-	<script type="module" src="js/index.js"></script>
+	<script type="module" src="src/js/reservation.js"></script>
+	<script type="module" src="src/js/index.js"></script>
 </html>

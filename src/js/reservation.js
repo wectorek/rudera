@@ -361,6 +361,10 @@ export class Reservation {
 		document.getElementById("checkIn").value = fmt(arrival);
 		document.getElementById("checkOut").value = fmt(departure);
 		document.getElementById("guests").value = 2;
+
+		// Pokaż krok 2
+		document.getElementById("bookingStep2").style.display = "block";
+
 		document.getElementById("bikeRental").checked = true;
 		document.getElementById("campfire").checked = true;
 		document.getElementById("kayakRental").checked = false;
@@ -379,6 +383,31 @@ export class Reservation {
 			if (fillBtn) {
 				fillBtn.addEventListener("click", () => Reservation.fillTestData());
 			}
+
+			const checkBtn = document.getElementById("checkAvailabilityForm");
+			if (checkBtn) {
+				checkBtn.addEventListener("click", () => {
+					const checkIn = document.getElementById("checkIn").value;
+					const checkOut = document.getElementById("checkOut").value;
+					const guests = document.getElementById("guests").value;
+
+					if (!checkIn || !checkOut || !guests) {
+						alert("Wypełnij wszystkie pola.");
+						return;
+					}
+
+					// Na razie termin zawsze dostępny
+					const isAvailable = true;
+
+					if (isAvailable) {
+						document.getElementById("bookingStep2").style.display = "block";
+					} else {
+						// TODO: pokaż kalendarz z dostępnością
+						alert("Wybrany termin jest niedostępny.");
+					}
+				});
+			}
+
 			bookingForm.addEventListener("submit", async (event) => {
 				event.preventDefault(); // Zapobiega przeładowaniu strony
 
@@ -423,7 +452,15 @@ export class Reservation {
 				const reservationId = docRef.id;
 				console.log("RESERVATION CREATED: " + reservationId);
 
+				// Wyślij powiadomienie email
+				fetch('http://localhost:3000/', {
+				  method: 'POST',
+				  headers: { 'Content-Type': 'application/json' },
+				  body: JSON.stringify(plainObj),
+				}).then(r => r.text()).then(console.log);
+
 				bookingForm.reset();
+				document.getElementById("bookingStep2").style.display = "none";
 				document.getElementById("myReservation").click();
 			});
 		}
