@@ -531,8 +531,20 @@ form select {
 	outline: none;
 }
 
-#availability-bar input:first-child {
+#availability-bar :first-child {
 	border-radius: 8px 0 0 8px;
+}
+
+
+
+#quickCheckInLabel{
+	font-family: "Noto Sans Linear A", sans-serif;
+	font-size: 1rem;
+	padding: 12px 20px;
+	background-color: #202327;
+	color: white;
+	border-radius: 0 8px 8px 0;
+	white-space: nowrap;
 }
 
 #availability-bar input:last-of-type {
