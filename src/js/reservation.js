@@ -1,4 +1,3 @@
-import { addDocument } from "./apis/firebase/firebase.js";
 import { auth } from "./apis/firebase/firebase.js";
 
 // Cache pobranych rezerwacji — unika ponownego zapytania do Firebase
@@ -459,19 +458,26 @@ export class Reservation {
 					plainObj.userId = currentUser.uid;
 				}
 
-				// Zapisz rezerwację do bazy i otrzymaj ID
-				const docRef = await addDocument(plainObj);
-				const reservationId = docRef.id;
-				console.log("RESERVATION CREATED: " + reservationId);
-
-				// Wyślij powiadomienie email
-				fetch("http://localhost:3000/make-reservation", {
+				// Zapisz rezerwację do bazy i wyślij email przez backend
+				const response = await fetch("http://localhost:3000/make-reservation", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(plainObj),
-				})
-					.then((r) => r.text())
-					.then(console.log);
+				});
+
+				if (response.status === 409) {
+					const { error } = await response.json();
+					alert(error || "Wybrany termin jest już zajęty. Wybierz inne daty.");
+					return;
+				}
+
+				if (!response.ok) {
+					alert("Wystąpił błąd podczas tworzenia rezerwacji. Spróbuj ponownie.");
+					return;
+				}
+
+				const { reservationId } = await response.json();
+				console.log("RESERVATION CREATED: " + reservationId);
 
 				bookingForm.reset();
 				document.getElementById("bookingStep2").style.display = "none";

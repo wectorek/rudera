@@ -1,6 +1,92 @@
 import { Reservation } from "../reservation.js";
 import { initCopyButton } from "./copyButton.js";
 
+// ===== Kalendarz dostępności =====
+
+function buildReservedSet(dates) {
+	const set = new Set();
+	for (const { arrivalDate, departureDate } of dates) {
+		const start = new Date(arrivalDate);
+		const end = new Date(departureDate);
+		for (const d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+			set.add(d.toISOString().split("T")[0]);
+		}
+	}
+	return set;
+}
+
+function renderCalendar(reservedSet, year, month) {
+	const grid = document.getElementById("calGrid");
+	const label = document.getElementById("calMonthLabel");
+	if (!grid || !label) return;
+
+	const monthNames = [
+		"Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
+		"Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień",
+	];
+	label.textContent = `${monthNames[month]} ${year}`;
+	grid.innerHTML = "";
+
+	["Pn","Wt","Śr","Cz","Pt","So","Nd"].forEach((name) => {
+		const cell = document.createElement("div");
+		cell.className = "cal-day-name";
+		cell.textContent = name;
+		grid.appendChild(cell);
+	});
+
+	const startOffset = (new Date(year, month, 1).getDay() + 6) % 7;
+	for (let i = 0; i < startOffset; i++) {
+		const empty = document.createElement("div");
+		empty.className = "cal-day cal-empty";
+		grid.appendChild(empty);
+	}
+
+	const daysInMonth = new Date(year, month + 1, 0).getDate();
+	const today = new Date().toISOString().split("T")[0];
+
+	for (let day = 1; day <= daysInMonth; day++) {
+		const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+		const cell = document.createElement("div");
+		cell.className = "cal-day";
+		cell.textContent = day;
+		if (reservedSet.has(dateStr)) cell.classList.add("cal-reserved");
+		if (dateStr === today) cell.classList.add("cal-today");
+		grid.appendChild(cell);
+	}
+}
+
+async function initReservationCalendar() {
+	let reservedSet = new Set();
+
+	try {
+		const response = await fetch("http://localhost:3000/reserved-dates");
+		if (response.ok) {
+			const dates = await response.json();
+			reservedSet = buildReservedSet(dates);
+		} else {
+			console.warn("Kalendarz: serwer zwrócił błąd", response.status);
+		}
+	} catch (err) {
+		console.warn("Kalendarz: nie można pobrać zarezerwowanych dat:", err.message);
+	}
+
+	let currentYear = new Date().getFullYear();
+	let currentMonth = new Date().getMonth();
+
+	renderCalendar(reservedSet, currentYear, currentMonth);
+
+	document.getElementById("calPrev")?.addEventListener("click", () => {
+		currentMonth--;
+		if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+		renderCalendar(reservedSet, currentYear, currentMonth);
+	});
+	document.getElementById("calNext")?.addEventListener("click", () => {
+		currentMonth++;
+		if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+		renderCalendar(reservedSet, currentYear, currentMonth);
+	});
+}
+
 // Flaga do śledzenia czy formularz rezerwacji został zainicjalizowany
 let bookingFormInitialized = false;
 let bookingContentLoaded = false;
@@ -106,12 +192,22 @@ export async function showSubpage(
 		bookingFormInitialized = false;
 
 		const { auth } = await import("../apis/firebase/firebase.js");
+		const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js");
 		const reservationId = new URLSearchParams(window.location.search).get("reservationId");
 		if (reservationId) {
 			Reservation.loadReservation(reservationId);
-		} else if (auth.currentUser) {
-			Reservation.loadMyReservations(auth.currentUser.uid);
+		} else {
+			await new Promise((resolve) => {
+				const unsubscribe = onAuthStateChanged(auth, (user) => {
+					unsubscribe();
+					if (user) {
+						Reservation.loadMyReservations(user.uid);
+					}
+					resolve();
+				});
+			});
 		}
+		initReservationCalendar();
 	} else {
 		// Dla innych przycisków pokaż subpage i ukryj supbageBooking
 		subpageElement.style.display = "block";
