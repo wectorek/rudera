@@ -129,9 +129,8 @@ export class Reservation {
 
 	static async loadReservation(reservationId) {
 		try {
-			const { getDoc, doc } = await import(
-				"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js"
-			);
+			const { getDoc, doc } =
+				await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
 			const { db } = await import("./apis/firebase/firebase.js");
 
 			const reservationRef = doc(db, "reservations", reservationId);
@@ -178,9 +177,8 @@ export class Reservation {
 
 	static async loadMyReservation(userId) {
 		try {
-			const { query, where, getDocs, collection } = await import(
-				"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js"
-			);
+			const { query, where, getDocs, collection } =
+				await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
 			const { db } = await import("./apis/firebase/firebase.js");
 
 			const q = query(
@@ -221,7 +219,8 @@ export class Reservation {
 
 			reservation.showSummary();
 
-			const reservationLinkInput = document.getElementById("reservationLink");
+			const reservationLinkInput =
+				document.getElementById("reservationLink");
 			if (reservationLinkInput) {
 				reservationLinkInput.value = `${window.location.origin}${window.location.pathname}?page=myReservation&reservationId=${docSnap.id}`;
 			}
@@ -233,9 +232,8 @@ export class Reservation {
 
 	static async loadMyReservations(userId) {
 		try {
-			const { query, where, getDocs, collection } = await import(
-				"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js"
-			);
+			const { query, where, getDocs, collection } =
+				await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
 			const { db } = await import("./apis/firebase/firebase.js");
 
 			const q = query(
@@ -245,7 +243,9 @@ export class Reservation {
 
 			const snapshot = await getDocs(q);
 
-			const listContainer = document.getElementById("reservationListItems");
+			const listContainer = document.getElementById(
+				"reservationListItems",
+			);
 			const noReservations = document.getElementById("noReservations");
 
 			if (snapshot.empty) {
@@ -268,7 +268,9 @@ export class Reservation {
 			}));
 
 			// Pobierz szablon
-			const template = document.getElementById("reservationListItemTemplate");
+			const template = document.getElementById(
+				"reservationListItemTemplate",
+			);
 
 			sorted.forEach((docSnap, index) => {
 				const data = docSnap.data();
@@ -288,12 +290,13 @@ export class Reservation {
 					: "";
 
 				clone.querySelector(".list-item-name").textContent = fullName;
-				clone.querySelector(".list-item-price").textContent = data.totalPrice + " zł";
+				clone.querySelector(".list-item-price").textContent =
+					data.totalPrice + " zł";
 				clone.querySelector(".list-item-dates").textContent = datesText;
-				clone.querySelector(".list-item-guests").textContent = guestsText;
-				clone.querySelector(".list-item-created").textContent = createdText
-					? `Dodano: ${createdText}`
-					: "";
+				clone.querySelector(".list-item-guests").textContent =
+					guestsText;
+				clone.querySelector(".list-item-created").textContent =
+					createdText ? `Dodano: ${createdText}` : "";
 
 				listContainer.appendChild(clone);
 			});
@@ -325,22 +328,28 @@ export class Reservation {
 
 				reservation.showSummary();
 
-				const reservationLinkInput = document.getElementById("reservationLink");
+				const reservationLinkInput =
+					document.getElementById("reservationLink");
 				if (reservationLinkInput) {
 					reservationLinkInput.value = `${window.location.origin}${window.location.pathname}?page=myReservation&reservationId=${docId}`;
 				}
 
 				// Przełącz widoki
-				document.getElementById("reservationList").style.display = "none";
-				document.getElementById("backToList").style.display = "inline-block";
+				document.getElementById("reservationList").style.display =
+					"none";
+				document.getElementById("backToList").style.display =
+					"inline-block";
 			});
 
 			// Obsługa przycisku "Wróć do listy"
 			const backBtn = document.getElementById("backToList");
 			if (backBtn) {
 				backBtn.addEventListener("click", () => {
-					document.getElementById("reservationSummary").style.display = "none";
-					document.getElementById("reservationList").style.display = "block";
+					document.getElementById(
+						"reservationSummary",
+					).style.display = "none";
+					document.getElementById("reservationList").style.display =
+						"block";
 				});
 			}
 		} catch (error) {
@@ -381,7 +390,9 @@ export class Reservation {
 		if (bookingForm) {
 			const fillBtn = document.getElementById("fillTestData");
 			if (fillBtn) {
-				fillBtn.addEventListener("click", () => Reservation.fillTestData());
+				fillBtn.addEventListener("click", () =>
+					Reservation.fillTestData(),
+				);
 			}
 
 			const checkBtn = document.getElementById("checkAvailabilityForm");
@@ -400,7 +411,8 @@ export class Reservation {
 					const isAvailable = true;
 
 					if (isAvailable) {
-						document.getElementById("bookingStep2").style.display = "block";
+						document.getElementById("bookingStep2").style.display =
+							"block";
 					} else {
 						// TODO: pokaż kalendarz z dostępnością
 						alert("Wybrany termin jest niedostępny.");
@@ -440,7 +452,7 @@ export class Reservation {
 				// Utwórz obiekt rezerwacji
 				const reservation = new Reservation(reservationData);
 
-				// Dodaj ID użytkownika jeśli zalogowany
+				// Dodaj ID użytkownika jeśli zalogowany 
 				const plainObj = reservation.toPlainObject();
 				const currentUser = auth.currentUser;
 				if (currentUser) {
@@ -453,11 +465,13 @@ export class Reservation {
 				console.log("RESERVATION CREATED: " + reservationId);
 
 				// Wyślij powiadomienie email
-				fetch('http://localhost:3000/', {
-				  method: 'POST',
-				  headers: { 'Content-Type': 'application/json' },
-				  body: JSON.stringify(plainObj),
-				}).then(r => r.text()).then(console.log);
+				fetch("http://localhost:3000/make-reservation", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(plainObj),
+				})
+					.then((r) => r.text())
+					.then(console.log);
 
 				bookingForm.reset();
 				document.getElementById("bookingStep2").style.display = "none";

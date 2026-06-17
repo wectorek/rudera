@@ -26,6 +26,7 @@ export async function addDocument(data) {
 
 export { db, app, auth };
 //import { app } from "./apis/firebase/firebase.js";
+//adding reservation to database is located
 import {
 	getAuth,
 	GoogleAuthProvider,

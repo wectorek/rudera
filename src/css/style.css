@@ -537,7 +537,7 @@ form select {
 
 
 
-#quickCheckInLabel{
+.availabilityBarLabel{
 	font-family: "Noto Sans Linear A", sans-serif;
 	font-size: 1rem;
 	padding: 12px 20px;
