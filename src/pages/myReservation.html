@@ -124,4 +124,24 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="summary-section">
+		<button id="cancelReservationBtn" class="cancel-btn">Anuluj rezerwację</button>
+	</div>
+</div>
+
+<div id="cancelModal" style="display:none">
+	<div id="cancelModalBackdrop"></div>
+	<div id="cancelModalContent">
+		<h3>Anulowanie rezerwacji</h3>
+		<p>Czy na pewno chcesz anulować tę rezerwację? Tej operacji nie można cofnąć.</p>
+		<div class="cancel-modal-field">
+			<label for="cancelReason">Powód anulowania (opcjonalnie):</label>
+			<textarea id="cancelReason" rows="4" placeholder="Podaj powód anulowania..."></textarea>
+		</div>
+		<div class="cancel-modal-buttons">
+			<button id="cancelModalConfirm" class="cancel-btn">Anuluj rezerwację</button>
+			<button id="cancelModalClose" class="cancel-modal-close-btn">Zamknij</button>
+		</div>
+	</div>
 </div>

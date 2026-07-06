@@ -79,7 +79,7 @@ export class Reservation {
 		return `${this.contact.firstName} ${this.contact.lastName}`;
 	}
 
-	showSummary() {
+	showSummary(reservationId = null) {
 		// Ukryj formularz
 		const bookingForm = document.getElementById("bookingForm");
 		if (bookingForm) bookingForm.style.display = "none";
@@ -119,6 +119,51 @@ export class Reservation {
 		// Estymowana cena
 		document.getElementById("summaryPrice").textContent =
 			this.calculateTotalPrice() + " zł";
+
+		// Przycisk anulowania
+		const cancelBtn = document.getElementById("cancelReservationBtn");
+		if (cancelBtn && reservationId) {
+			cancelBtn.style.display = "inline-block";
+			cancelBtn.onclick = () => Reservation.cancelReservation(reservationId);
+		} else if (cancelBtn) {
+			cancelBtn.style.display = "none";
+		}
+	}
+
+	static async cancelReservation(reservationId) {
+		const result = await Reservation._showCancelModal();
+		if (!result.confirmed) return;
+
+		try {
+			const response = await fetch(
+				`http://localhost:3000/reservation/${encodeURIComponent(reservationId)}`,
+				{
+					method: "DELETE",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ reason: result.reason ?? null }),
+				},
+			);
+
+			if (response.status === 404) {
+				alert("Rezerwacja nie istnieje lub została już anulowana.");
+				return;
+			}
+			if (!response.ok) {
+				alert("Wystąpił błąd podczas anulowania rezerwacji. Spróbuj ponownie.");
+				return;
+			}
+
+			alert("Rezerwacja została anulowana.");
+
+			// Przeładuj cały widok — odświeży listę i kalendarz
+			const url = new URL(window.location.href);
+			url.searchParams.delete("reservationId");
+			window.history.pushState({}, "", url);
+			document.getElementById("myReservation")?.click();
+		} catch (error) {
+			console.error("Błąd podczas anulowania rezerwacji:", error);
+			alert("Wystąpił błąd podczas anulowania rezerwacji.");
+		}
 	}
 
 	static getReservationIdFromURL() {
@@ -139,6 +184,11 @@ export class Reservation {
 				const data = reservationSnap.data();
 				console.log("Dane rezerwacji:", data);
 
+				if (data.isCancelled) {
+					alert("Ta rezerwacja została anulowana.");
+					return;
+				}
+
 				// Utwórz obiekt rezerwacji z pobranych danych
 				const reservationData = {
 					arrivalDate: data.arrivalDate,
@@ -155,7 +205,7 @@ export class Reservation {
 				};
 
 				const reservation = new Reservation(reservationData);
-				reservation.showSummary();
+				reservation.showSummary(reservationId);
 
 				// Wypełnij link do rezerwacji
 				const reservationLinkInput =
@@ -193,11 +243,18 @@ export class Reservation {
 			}
 
 			// Sortuj po stronie klienta — najnowsza rezerwacja pierwsza
-			const sorted = snapshot.docs.sort((a, b) => {
-				const aDate = a.data().createdAt ?? "";
-				const bDate = b.data().createdAt ?? "";
-				return bDate.localeCompare(aDate);
-			});
+			const sorted = snapshot.docs
+				.filter((d) => !d.data().isCancelled)
+				.sort((a, b) => {
+					const aDate = a.data().createdAt ?? "";
+					const bDate = b.data().createdAt ?? "";
+					return bDate.localeCompare(aDate);
+				});
+
+			if (sorted.length === 0) {
+				alert("Nie masz żadnej aktywnej rezerwacji.");
+				return;
+			}
 
 			const docSnap = sorted[0];
 			const data = docSnap.data();
@@ -216,7 +273,7 @@ export class Reservation {
 				email: data.contact.email,
 			});
 
-			reservation.showSummary();
+			reservation.showSummary(docSnap.id);
 
 			const reservationLinkInput =
 				document.getElementById("reservationLink");
@@ -253,12 +310,20 @@ export class Reservation {
 				return;
 			}
 
-			// Sortuj po stronie klienta — najnowsza rezerwacja pierwsza
-			const sorted = snapshot.docs.sort((a, b) => {
-				const aDate = a.data().createdAt ?? "";
-				const bDate = b.data().createdAt ?? "";
-				return bDate.localeCompare(aDate);
-			});
+			// Sortuj po stronie klienta — najnowsza rezerwacja pierwsza; pomiń anulowane
+			const sorted = snapshot.docs
+				.filter((d) => !d.data().isCancelled)
+				.sort((a, b) => {
+					const aDate = a.data().createdAt ?? "";
+					const bDate = b.data().createdAt ?? "";
+					return bDate.localeCompare(aDate);
+				});
+
+			if (sorted.length === 0) {
+				noReservations.style.display = "block";
+				listContainer.style.display = "none";
+				return;
+			}
 
 			// Zapisz dane do cache
 			loadedReservations = sorted.map((docSnap) => ({
@@ -302,6 +367,7 @@ export class Reservation {
 
 			// Event delegation — jeden listener na całej liście
 			listContainer.addEventListener("click", (e) => {
+				console.log("[1] Kliknięcie rezerwacji w loadMyReservations");
 				const item = e.target.closest(".reservation-list-item");
 				if (!item) return;
 
@@ -325,7 +391,7 @@ export class Reservation {
 					email: data.contact.email,
 				});
 
-				reservation.showSummary();
+				reservation.showSummary(docId);
 
 				const reservationLinkInput =
 					document.getElementById("reservationLink");
@@ -349,6 +415,157 @@ export class Reservation {
 					).style.display = "none";
 					document.getElementById("reservationList").style.display =
 						"block";
+				});
+			}
+		} catch (error) {
+			console.error("Błąd podczas pobierania rezerwacji:", error);
+			alert("Wystąpił błąd podczas pobierania danych rezerwacji");
+		}
+	}
+
+	static _showCancelModal() {
+		return new Promise((resolve) => {
+			const modal = document.getElementById("cancelModal");
+			const reasonInput = document.getElementById("cancelReason");
+			const confirmBtn = document.getElementById("cancelModalConfirm");
+			const closeBtn = document.getElementById("cancelModalClose");
+
+			reasonInput.value = "";
+			modal.style.display = "flex";
+
+			const cleanup = () => {
+				modal.style.display = "none";
+				confirmBtn.onclick = null;
+				closeBtn.onclick = null;
+			};
+
+			confirmBtn.onclick = () => {
+				const reason = reasonInput.value.trim() || null;
+				cleanup();
+				resolve({ confirmed: true, reason });
+			};
+
+			closeBtn.onclick = () => {
+				cleanup();
+				resolve({ confirmed: false });
+			};
+		});
+	}
+
+	static async loadAllReservations() {
+		console.log("[A] loadAllReservations() zaczęty");
+		try {
+			const { getDocs, collection } =
+				await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
+			const { db } = await import("./apis/firebase/firebase.js");
+
+			const snapshot = await getDocs(collection(db, "reservations"));
+			console.log("[B] Pobranych rezerwacji:", snapshot.docs.length);
+
+			const listContainer = document.getElementById("reservationListItems");
+			const noReservations = document.getElementById("noReservations");
+			console.log("[C] listContainer znaleziony:", !!listContainer, "noReservations znaleziony:", !!noReservations);
+
+			const heading = document.querySelector("#reservationList h2");
+			if (heading) heading.textContent = "Wszystkie rezerwacje";
+
+			const sorted = snapshot.docs
+				.filter((d) => !d.data().isCancelled)
+				.sort((a, b) => {
+					const aDate = a.data().createdAt ?? "";
+					const bDate = b.data().createdAt ?? "";
+					return bDate.localeCompare(aDate);
+				});
+
+			if (sorted.length === 0) {
+				console.log("[D] Brak rezerwacji do wyświetlenia");
+				noReservations.style.display = "block";
+				listContainer.style.display = "none";
+				return;
+			}
+
+			console.log("[E] Rezerwacji do wyświetlenia:", sorted.length);
+
+			loadedReservations = sorted.map((docSnap) => ({
+				docId: docSnap.id,
+				data: docSnap.data(),
+			}));
+
+			const template = document.getElementById("reservationListItemTemplate");
+			console.log("[F] Szablon znaleziony:", !!template);
+
+			sorted.forEach((docSnap, index) => {
+				const data = docSnap.data();
+				const clone = template.content.cloneNode(true);
+				const li = clone.querySelector(".reservation-list-item");
+				li.dataset.reservationIndex = index;
+
+				const fullName = `${data.contact?.firstName ?? ""} ${data.contact?.lastName ?? ""}`.trim();
+				const nights = data.numberOfNights ?? 0;
+				const datesText = `${data.arrivalDate} → ${data.departureDate} (${nights} ${nights === 1 ? "noc" : nights < 5 ? "noce" : "nocy"})`;
+				const guestsText = `${data.numberOfGuests} ${data.numberOfGuests === 1 ? "osoba" : data.numberOfGuests < 5 ? "osoby" : "osób"}`;
+				const createdText = data.createdAt
+					? new Date(data.createdAt).toLocaleDateString("pl-PL")
+					: "";
+
+				clone.querySelector(".list-item-name").textContent = fullName || "(brak danych)";
+				clone.querySelector(".list-item-price").textContent = (data.totalPrice ?? "?") + " zł";
+				clone.querySelector(".list-item-dates").textContent = datesText;
+				clone.querySelector(".list-item-guests").textContent = guestsText;
+				clone.querySelector(".list-item-created").textContent =
+					`${data.contact?.email ?? ""}${createdText ? ` · ${createdText}` : ""}`;
+
+				listContainer.appendChild(clone);
+			});
+
+			console.log("[G] Elementy dodane do DOM-u. Dodaję event listener...");
+
+			listContainer.addEventListener("click", (e) => {
+				const item = e.target.closest(".reservation-list-item");
+				if (!item) return;
+
+				const index = parseInt(item.dataset.reservationIndex, 10);
+				const cached = loadedReservations[index];
+				if (!cached) return;
+
+				const { data, docId } = cached;
+			console.log("[2] Kliknięcie rezerwacji w loadAllReservations", { docId, data });
+
+				const reservation = new Reservation({
+					arrivalDate: data.arrivalDate,
+					departureDate: data.departureDate,
+					numberOfGuests: data.numberOfGuests,
+					bikeRental: data.attractions?.bikeRental ?? false,
+					kayakRental: data.attractions?.kayakRental ?? false,
+					campfire: data.attractions?.campfire ?? false,
+					pets: data.attractions?.pets ?? false,
+					firstName: data.contact?.firstName ?? "",
+					lastName: data.contact?.lastName ?? "",
+					phone: data.contact?.phone ?? "",
+					email: data.contact?.email ?? "",
+				});
+
+				reservation.showSummary(docId);
+
+				// Zmień nagłówek szczegółów dla admina
+				const summaryHeading = document.querySelector("#reservationSummary > h2");
+				if (summaryHeading) summaryHeading.textContent = "Rezerwacja";
+
+				const reservationLinkInput = document.getElementById("reservationLink");
+				if (reservationLinkInput) {
+					reservationLinkInput.value = `${window.location.origin}${window.location.pathname}?page=myReservation&reservationId=${docId}`;
+				}
+
+				document.getElementById("reservationList").style.display = "none";
+				document.getElementById("backToList").style.display = "inline-block";
+			});
+
+			const backBtn = document.getElementById("backToList");
+			console.log("[H] backBtn znaleziony:", !!backBtn);
+			if (backBtn) {
+				backBtn.addEventListener("click", () => {
+					document.getElementById("reservationSummary").style.display = "none";
+					document.getElementById("reservationList").style.display = "block";
 				});
 			}
 		} catch (error) {

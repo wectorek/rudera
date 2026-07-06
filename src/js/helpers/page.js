@@ -90,6 +90,7 @@ async function initReservationCalendar() {
 // Flaga do śledzenia czy formularz rezerwacji został zainicjalizowany
 let bookingFormInitialized = false;
 let bookingContentLoaded = false;
+let heroBookingInitialized = false;
 
 // Cache dla załadowanych podstron
 const subpageCache = {};
@@ -155,9 +156,16 @@ export async function showSubpage(
 	// Przesuń linię
 	updateUnderline(newButton);
 
-	const subpageElement = document.getElementById("subpage");
-	const supbageBookingElement = document.getElementById("supbageBooking");
 	const subpageId = newButton.id;
+	const heroContentElement = document.getElementById("hero-content");
+
+	// Ukryj hero-booking przy nawigacji do innej podstrony
+	const heroBookingElement = document.getElementById("hero-booking");
+	if (heroBookingElement) {
+		heroBookingElement.classList.remove("visible");
+		heroBookingElement.innerHTML = "";
+		heroBookingInitialized = false;
+	}
 
 	// Aktualizuj URL
 	if (updateURL) {
@@ -165,33 +173,30 @@ export async function showSubpage(
 		window.history.pushState({ page: subpageId }, "", newURL);
 	}
 
-	// Jeśli kliknięto booking, pokaż div supbageBooking i ukryj subpage
 	if (subpageId === "booking") {
-		subpageElement.style.display = "none";
-		supbageBookingElement.style.display = "block";
-
-		// Załaduj zawartość formularza
-		await loadBookingContent();
-
-		// Inicjalizuj formularz rezerwacji przy pierwszym wejściu
+		// Załaduj formularz rezerwacji do hero-content
+		if (!heroContentElement.querySelector("#bookingForm")) {
+			const html = await loadSubpageContent("booking");
+			heroContentElement.innerHTML = html;
+		}
 		if (!bookingFormInitialized) {
 			Reservation.initBookingForm();
 			bookingFormInitialized = true;
 		}
+		heroContentElement.classList.add("visible");
 	} else if (subpageId === "myReservation") {
-		subpageElement.style.display = "none";
-		supbageBookingElement.style.display = "block";
-
 		// Świeża kopia — reset widoku
 		const response = await fetch("src/pages/myReservation.html");
-		supbageBookingElement.innerHTML = await response.text();
+		heroContentElement.innerHTML = await response.text();
 		initCopyButton();
+		heroContentElement.classList.add("visible");
 
 		// Reset flag — booking musi załadować się od nowa po powrocie
 		bookingContentLoaded = false;
 		bookingFormInitialized = false;
 
 		const { auth } = await import("../apis/firebase/firebase.js");
+		const { isAdmin } = await import("../apis/firebase/firebase.js");
 		const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js");
 		const reservationId = new URLSearchParams(window.location.search).get("reservationId");
 		if (reservationId) {
@@ -201,7 +206,11 @@ export async function showSubpage(
 				const unsubscribe = onAuthStateChanged(auth, (user) => {
 					unsubscribe();
 					if (user) {
-						Reservation.loadMyReservations(user.uid);
+						if (isAdmin(user)) {
+							Reservation.loadAllReservations();
+						} else {
+							Reservation.loadMyReservations(user.uid);
+						}
 					}
 					resolve();
 				});
@@ -209,13 +218,10 @@ export async function showSubpage(
 		}
 		initReservationCalendar();
 	} else {
-		// Dla innych przycisków pokaż subpage i ukryj supbageBooking
-		subpageElement.style.display = "block";
-		supbageBookingElement.style.display = "none";
-		
-		// Załaduj zawartość podstrony z pliku HTML
+		// Zwykłe podstrony
 		const content = await loadSubpageContent(subpageId);
-		subpageElement.innerHTML = content;
+		heroContentElement.innerHTML = content;
+		heroContentElement.classList.add("visible");
 	}
 
 	return newButton;
@@ -236,16 +242,16 @@ export function initAvailabilityBar() {
 			return;
 		}
 
-		// Załaduj formularz rezerwacji bezpośrednio
-		const subpageElement = document.getElementById("subpage");
-		const supbageBookingElement = document.getElementById("supbageBooking");
-		subpageElement.style.display = "none";
-		supbageBookingElement.style.display = "block";
+		const heroBookingElement = document.getElementById("hero-booking");
 
-		await loadBookingContent();
-		if (!bookingFormInitialized) {
+		if (!heroBookingElement.innerHTML.trim()) {
+			const html = await loadSubpageContent("booking");
+			heroBookingElement.innerHTML = html;
+		}
+
+		if (!heroBookingInitialized) {
 			Reservation.initBookingForm();
-			bookingFormInitialized = true;
+			heroBookingInitialized = true;
 		}
 
 		// Przepisz wartości i pokaż krok 2
@@ -253,5 +259,15 @@ export function initAvailabilityBar() {
 		document.getElementById("checkOut").value = checkOut;
 		document.getElementById("guests").value = guests;
 		document.getElementById("bookingStep2").style.display = "block";
+
+		// Ukryj hero-content przy otwieraniu availability bar
+		const heroContentEl = document.getElementById("hero-content");
+		if (heroContentEl) {
+			heroContentEl.classList.remove("visible");
+		}
+
+		// Rozwiń hero-booking
+		heroBookingElement.classList.add("visible");
+		heroBookingElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
 	});
 }

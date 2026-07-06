@@ -6,57 +6,6 @@
 		<title>Rudera</title>
 		<link rel="stylesheet" href="src/css/style.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-		<script src="https://accounts.google.com/gsi/client" async defer></script>
-		<script>
-			const CLIENT_ID =
-				"302980156761-rkn7e1pdcnm5hp3k2bq5jqqftogqdo38.apps.googleusercontent.com";
-			const SCOPES = "https://www.googleapis.com/auth/gmail.send";
-
-			let accessToken = null;
-
-			function initClient() {
-				google.accounts.oauth2
-					.initTokenClient({
-						client_id: CLIENT_ID,
-						scope: SCOPES,
-						callback: (tokenResponse) => {
-							accessToken = tokenResponse.access_token;
-							sendEmail();
-						},
-					})
-					.requestAccessToken();
-			}
-
-			function sendEmail() {
-				const email = [
-					"To: robczek@onet.pl",
-					"Subject: Test Gmail API",
-					"",
-					"To jest testowa wiadomość.",
-				].join("\n");
-
-				const encodedEmail = btoa(unescape(encodeURIComponent(email)))
-					.replace(/\+/g, "-")
-					.replace(/=+$/, "");
-
-				fetch(
-					"https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
-					{
-						method: "POST",
-						headers: {
-							Authorization: `Bearer ${accessToken}`,
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({
-							raw: encodedEmail,
-						}),
-					},
-				)
-					.then((res) => res.json())
-					.then((data) => console.log("Wysłano:", data))
-					.catch((err) => console.error(err));
-			}
-		</script>
 	</head>
 	<body>
 		<div id="map"></div>
@@ -78,9 +27,8 @@
 					<button
 						id="areaDescription"
 						class="navigation-button"
-						onclick="initClient()"
 					>
-						<i class="fas fa-envelope"></i>Gmail
+						<i class="fas fa-map-marked-alt"></i>Okolica
 					</button>
 					<button id="contact" class="navigation-button"><i class="fas fa-phone"></i>Kontakt</button>
 					<div id="underline"></div>
@@ -98,15 +46,28 @@
 				<span id="user-display" style="display: none;"></span>
 			</div>
 		</div>
-		<div id="availability-bar">
-			<label class="availabilityBarLabel">Data przyjazdu</label>
-			<input type="date" id="quickCheckIn" />
-			<label class="availabilityBarLabel">Data wyjazdu</label>
-			<input type="date" id="quickCheckOut" />
-			<label class="availabilityBarLabel">Liczba osób</label>
-
-			<input type="number" id="quickGuests" min="1" max="5" value="1" />
-			<button id="checkAvailability">Sprawdź dostępność</button>
+		<div id="hero">
+			<div class="hero-text">
+				<h1>Leśniczówka Rudera</h1>
+				<p>Zarezerwuj pobyt w sercu lasu</p>
+			</div>
+			<div id="availability-bar">
+				<div class="search-field">
+					<label class="availabilityBarLabel">Data przyjazdu</label>
+					<input type="date" id="quickCheckIn" />
+				</div>
+				<div class="search-field">
+					<label class="availabilityBarLabel">Data wyjazdu</label>
+					<input type="date" id="quickCheckOut" />
+				</div>
+				<div class="search-field">
+					<label class="availabilityBarLabel">Liczba osób</label>
+					<input type="number" id="quickGuests" min="1" max="5" value="1" />
+				</div>
+				<button id="checkAvailability">Sprawdź dostępność</button>
+			</div>
+			<div id="hero-booking"></div>
+			<div id="hero-content"></div>
 		</div>
 		<div id="page-container">
 			<div id="auth-status"></div>

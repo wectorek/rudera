@@ -1,136 +1,383 @@
-@import url("https://fonts.googleapis.com/css2?family=Modak&family=Noto+Sans+Linear+A&family=Roboto:ital,wght@0,100..900;1,100..900&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
-/* #map {
-    height: 100%;
-} */
+/* ===== CSS Variables ===== */
+
+:root {
+	--color-bg-start: #0b1b2e;
+	--color-bg-mid: #0f3460;
+	--color-bg-end: #16213e;
+	--color-bg-grad: linear-gradient(160deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
+	--color-text: #e8edf4;
+	--color-muted: #8fa3b8;
+	--color-primary: #4a9eff;
+	--color-primary-dim: rgba(74, 158, 255, 0.18);
+	--color-accent: #c8963e;
+	--color-surface: rgba(255, 255, 255, 0.06);
+	--color-surface-hover: rgba(255, 255, 255, 0.1);
+	--color-border: rgba(255, 255, 255, 0.11);
+	--color-danger: #e74c3c;
+	--navbar-height: 80px;
+	--radius: 10px;
+	--font: "Roboto", sans-serif;
+}
+
+/* ===== Reset & Base ===== */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
 
 html,
 body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-family: "Noto Sans Linear A", sans-serif;
-    font-weight: 400;
-    font-style: normal;
+	height: 100%;
+	margin: 0;
+	padding: 0;
 }
 
-#auth-status {
-	padding: 6px 14px;
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-size: 0.85rem;
-	color: #555;
-	text-align: right;
-}
-
-#main-image {
-	width: 100vw;
-	background-image: linear-gradient(to bottom, red, yellow);
-}
-
-.navigation-button {
-	border: none;
-	font-size: 0.9rem;
-	font-family: "Noto Sans Linear A", sans-serif;
+body {
+	font-family: var(--font);
 	font-weight: 400;
-	font-style: normal;
-	background-color: transparent;
-	cursor: pointer;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
-	padding: 10px 16px;
-	white-space: nowrap;
+	background: var(--color-bg-grad);
+	background-attachment: fixed;
+	color: var(--color-text);
+	min-height: 100vh;
 }
 
-.navigation-button i {
-	font-size: 1.3rem;
+* {
+	color: var(--color-text);
 }
+
+#map {
+	display: none;
+}
+
+/* ===== Navbar ===== */
 
 #navbar {
 	width: 100%;
-	background-color: 
-	#0d305a;
-	border: none;
+	height: var(--navbar-height);
+	background: linear-gradient(90deg, #0d1f3c 0%, #0f3460 100%);
+	border-bottom: 1px solid var(--color-border);
 	display: flex;
 	flex-direction: row;
 	align-items: stretch;
 	justify-content: space-between;
 	box-sizing: border-box;
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	backdrop-filter: blur(12px);
 }
 
 #navbar-left {
 	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0;
+}
+
+#navbar-title {
+	font-family: var(--font);
+	font-size: 1.6rem;
+	font-weight: 300;
+	letter-spacing: 3px;
+	padding: 0 28px;
+	color: var(--color-primary);
+	white-space: nowrap;
+	border-right: 1px solid var(--color-border);
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+
+#navigation {
+	display: flex;
+	align-items: stretch;
+	position: relative;
+	height: 100%;
+}
+
+.navigation-button {
+	border: none;
+	font-size: 0.82rem;
+	font-family: var(--font);
+	font-weight: 400;
+	letter-spacing: 0.3px;
+	background-color: transparent;
+	cursor: pointer;
+	display: flex;
 	flex-direction: column;
-	align-items: flex-start;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	padding: 0 20px;
+	color: var(--color-muted);
+	transition: color 0.2s ease;
+	white-space: nowrap;
+	position: relative;
+}
+
+.navigation-button:hover {
+	color: var(--color-text);
+}
+
+.navigation-button.current-button {
+	color: var(--color-primary);
+}
+
+.navigation-button i {
+	font-size: 1.15rem;
+}
+
+#underline {
+	position: absolute;
+	bottom: 0;
+	height: 2px;
+	background-color: var(--color-primary);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	border-radius: 2px 2px 0 0;
 }
 
 #navbar-right {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	padding-right: 20px;
-	gap: 4px;
+	padding-right: 24px;
+	gap: 8px;
 }
 
 #user-display {
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-size: 0.9rem;
-	color: white;
-	padding: 0 12px;
+	font-family: var(--font);
+	font-size: 0.88rem;
+	color: var(--color-muted);
+	padding: 0 8px;
 }
 
-#navbar-title {
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-size: 2.5rem;
-	font-weight: 400;
-	letter-spacing: 2px;
-	padding: 12px 0 4px 20px;
-	color: white;
+#login,
+#logout {
+	font-size: 0.82rem;
+	border: 1px solid rgba(74, 158, 255, 0.4);
+	border-radius: 6px;
+	padding: 8px 16px;
+	color: var(--color-primary);
+	transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-#navigation {
-	border: none;
-	display: flex;
-	justify-content: flex-start;
-	width: auto;
+#login:hover,
+#logout:hover {
+	background: var(--color-primary-dim);
+	border-color: var(--color-primary);
+}
+
+/* ===== Hero ===== */
+
+#hero {
 	position: relative;
+	min-height: calc(100vh - var(--navbar-height));
+	background-image: url("../resources/panorama.jpeg");
+	background-size: cover;
+	background-position: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 36px;
+	padding: 60px 24px;
 }
 
-#underline {
+#hero::before {
+	content: "";
 	position: absolute;
-	bottom: 10px;
-	height: 3px;
-	background-color: white;
-	transition: all 0.3s ease;
+	inset: 0;
+	background: linear-gradient(
+		to bottom,
+		rgba(5, 20, 55, 0.62) 0%,
+		rgba(8, 30, 70, 0.5) 60%,
+		rgba(5, 20, 45, 0.72) 100%
+	);
+	pointer-events: none;
 }
+
+.hero-text {
+	position: relative;
+	text-align: center;
+	z-index: 1;
+}
+
+.hero-text h1 {
+	font-size: 3rem;
+	font-weight: 300;
+	letter-spacing: 4px;
+	margin: 0 0 12px;
+	color: #ffffff;
+	text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+.hero-text p {
+	font-size: 1.1rem;
+	font-weight: 300;
+	color: rgba(232, 237, 244, 0.8);
+	margin: 0;
+	letter-spacing: 1px;
+}
+
+/* ===== Search Card (availability-bar) ===== */
+
+#availability-bar {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: flex-end;
+	gap: 0;
+	background: rgba(10, 25, 55, 0.72);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid var(--color-border);
+	border-radius: 16px;
+	padding: 24px 28px;
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(74, 158, 255, 0.08);
+}
+
+.search-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.availabilityBarLabel {
+	font-family: var(--font);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: 0.8px;
+	text-transform: uppercase;
+	color: var(--color-muted);
+	padding: 0 4px;
+}
+
+#availability-bar input[type="date"],
+#availability-bar input[type="number"] {
+	font-family: var(--font);
+	font-size: 0.95rem;
+	padding: 11px 14px;
+	border: 1px solid var(--color-border);
+	border-right: none;
+	background: rgba(255, 255, 255, 0.07);
+	color: var(--color-text);
+	outline: none;
+	transition: border-color 0.2s ease, background 0.2s ease;
+	min-width: 140px;
+}
+
+#availability-bar input[type="date"]:focus,
+#availability-bar input[type="number"]:focus {
+	border-color: rgba(74, 158, 255, 0.5);
+	background: rgba(255, 255, 255, 0.11);
+}
+
+.search-field:first-child input {
+	border-radius: 8px 0 0 8px;
+}
+
+.search-field:last-of-type input {
+	border-right: 1px solid var(--color-border);
+	border-radius: 0 8px 8px 0;
+}
+
+#checkAvailability {
+	font-family: var(--font);
+	font-size: 0.9rem;
+	font-weight: 500;
+	padding: 11px 24px;
+	background: var(--color-primary);
+	color: #ffffff;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	white-space: nowrap;
+	margin-left: 14px;
+	transition: background 0.2s ease, box-shadow 0.2s ease;
+	box-shadow: 0 4px 16px rgba(74, 158, 255, 0.35);
+}
+
+#checkAvailability:hover {
+	background: #5aabff;
+	box-shadow: 0 6px 22px rgba(74, 158, 255, 0.5);
+}
+
+/* ===== Hero inline sections (booking + nav content) ===== */
+
+#hero-booking,
+#hero-content {
+	position: relative;
+	z-index: 1;
+	width: min(780px, 100%);
+	max-height: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+#hero-booking.visible,
+#hero-content.visible {
+	max-height: 2400px;
+	opacity: 1;
+}
+
+#hero-booking #bookingForm,
+#hero-content > * {
+	background: rgba(10, 25, 55, 0.82);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid var(--color-border);
+	border-radius: 16px;
+	padding: 32px 36px;
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(74, 158, 255, 0.08);
+	margin-top: 16px;
+}
+
+/* ===== Page Container ===== */
 
 #page-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	padding: 40px 24px 60px;
+}
+
+#auth-status {
+	padding: 6px 14px;
+	font-family: var(--font);
+	font-size: 0.85rem;
+	color: var(--color-muted);
+	text-align: right;
 }
 
 #subpage {
-	border: 3px solid black;
-	width: 60vw;
-	font-size: 2rem;
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-optical-sizing: auto;
-	font-style: normal;
-	font-variation-settings: "wdth" 100;
-	padding: 20px;
+	width: min(720px, 100%);
+	font-size: 1rem;
+	font-family: var(--font);
+	padding: 32px;
 	box-sizing: border-box;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	backdrop-filter: blur(10px);
 }
 
-body {
-	background-color: black;
-	margin: 0;
+#supbageBooking {
+	width: min(720px, 100%);
+	font-family: var(--font);
+	padding: 32px;
+	box-sizing: border-box;
+	display: none;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
 }
 
-* {
-	color: white;
-}
+/* ===== Booking Form ===== */
 
 .img-wrap {
 	position: relative;
@@ -151,21 +398,17 @@ body {
 	pointer-events: none;
 }
 
-form input,
-form textarea,
-form select {
-	color: black;
-}
-
 .form-group {
-	margin-bottom: 25px;
+	margin-bottom: 22px;
 }
 
 .form-group label {
 	display: block;
 	margin-bottom: 8px;
-	font-size: 1.1rem;
+	font-size: 0.85rem;
 	font-weight: 500;
+	color: var(--color-muted);
+	letter-spacing: 0.4px;
 }
 
 .form-group input[type="text"],
@@ -174,14 +417,15 @@ form select {
 .form-group input[type="date"],
 .form-group input[type="number"] {
 	width: 100%;
-	padding: 12px 15px;
-	font-size: 1rem;
-	border: 2px solid #444;
+	padding: 11px 14px;
+	font-size: 0.95rem;
+	font-family: var(--font);
+	border: 1px solid var(--color-border);
 	border-radius: 8px;
 	box-sizing: border-box;
-	background-color: #1a1a1a;
-	color: white;
-	transition: all 0.3s ease;
+	background: rgba(255, 255, 255, 0.07);
+	color: var(--color-text);
+	transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .form-group input[type="text"]:focus,
@@ -190,14 +434,14 @@ form select {
 .form-group input[type="date"]:focus,
 .form-group input[type="number"]:focus {
 	outline: none;
-	border-color: #888;
-	background-color: #2a2a2a;
+	border-color: rgba(74, 158, 255, 0.55);
+	background: rgba(255, 255, 255, 0.1);
 }
 
 .form-section {
-	margin-bottom: 35px;
-	padding-bottom: 25px;
-	border-bottom: 1px solid #333;
+	margin-bottom: 30px;
+	padding-bottom: 22px;
+	border-bottom: 1px solid var(--color-border);
 }
 
 .form-section:last-of-type {
@@ -206,26 +450,29 @@ form select {
 
 .form-section h3 {
 	margin-top: 0;
-	margin-bottom: 20px;
-	font-size: 1.5rem;
-	color: #fff;
+	margin-bottom: 18px;
+	font-size: 1.1rem;
+	font-weight: 500;
+	color: var(--color-text);
+	letter-spacing: 0.3px;
 }
 
 .checkbox-group {
-	margin-bottom: 15px;
+	margin-bottom: 13px;
 	display: flex;
 	align-items: center;
 }
 
 .checkbox-group input[type="checkbox"] {
-	width: 20px;
-	height: 20px;
+	width: 17px;
+	height: 17px;
 	margin-right: 12px;
 	cursor: pointer;
+	accent-color: var(--color-primary);
 }
 
 .checkbox-group label {
-	font-size: 1rem;
+	font-size: 0.95rem;
 	margin: 0;
 	cursor: pointer;
 }
@@ -233,11 +480,12 @@ form select {
 .fill-test-btn {
 	width: 100%;
 	padding: 10px;
-	font-size: 0.9rem;
+	font-size: 0.85rem;
 	font-weight: 500;
-	color: #555;
+	font-family: var(--font);
+	color: var(--color-muted);
 	background: transparent;
-	border: 1px dashed #aaa;
+	border: 1px dashed rgba(255, 255, 255, 0.2);
 	border-radius: 8px;
 	cursor: pointer;
 	margin-bottom: 20px;
@@ -245,71 +493,66 @@ form select {
 }
 
 .fill-test-btn:hover {
-	background: #f0f0f0;
-	border-color: #777;
-	color: #333;
+	background: var(--color-surface-hover);
+	border-color: var(--color-muted);
+	color: var(--color-text);
 }
 
 .submit-btn {
 	width: 100%;
-	padding: 18px;
-	font-size: 1.3rem;
+	padding: 14px;
+	font-size: 1rem;
 	font-weight: 600;
-	color: white;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	font-family: var(--font);
+	color: #ffffff;
+	background: var(--color-primary);
 	border: none;
-	border-radius: 10px;
+	border-radius: 8px;
 	cursor: pointer;
-	transition: all 0.3s ease;
-	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+	transition: background 0.2s ease, box-shadow 0.2s ease;
+	box-shadow: 0 4px 16px rgba(74, 158, 255, 0.3);
+	letter-spacing: 0.3px;
 }
 
 .submit-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+	background: #5aabff;
+	box-shadow: 0 6px 22px rgba(74, 158, 255, 0.45);
 }
 
 .submit-btn:active {
-	transform: translateY(0);
+	background: #3a8eef;
 }
 
 #bookingForm h2 {
 	margin-top: 0;
-	margin-bottom: 30px;
-	font-size: 2.5rem;
+	margin-bottom: 24px;
+	font-size: 1.8rem;
+	font-weight: 300;
 	text-align: center;
-	color: #fff;
+	color: var(--color-text);
+	letter-spacing: 1px;
 }
 
-#supbageBooking {
-	border: 3px solid black;
-	width: 60vw;
-	font-size: 2rem;
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-optical-sizing: auto;
-	font-style: normal;
-	font-variation-settings: "wdth" 100;
-	padding: 20px;
-	box-sizing: border-box;
-	display: none;
-}
+/* ===== Reservation Summary ===== */
 
 #reservationSummary {
-	padding: 20px;
+	padding: 4px 0;
 }
 
 #reservationSummary h2 {
 	margin-top: 0;
-	margin-bottom: 30px;
-	font-size: 2.5rem;
+	margin-bottom: 24px;
+	font-size: 1.8rem;
+	font-weight: 300;
 	text-align: center;
-	color: #fff;
+	color: var(--color-text);
+	letter-spacing: 1px;
 }
 
 .summary-section {
-	margin-bottom: 35px;
-	padding-bottom: 25px;
-	border-bottom: 1px solid #333;
+	margin-bottom: 28px;
+	padding-bottom: 22px;
+	border-bottom: 1px solid var(--color-border);
 }
 
 .summary-section:last-of-type {
@@ -318,84 +561,84 @@ form select {
 
 .summary-section h3 {
 	margin-top: 0;
-	margin-bottom: 20px;
-	font-size: 1.5rem;
-	color: #fff;
+	margin-bottom: 16px;
+	font-size: 0.78rem;
+	font-weight: 600;
+	color: var(--color-muted);
+	text-transform: uppercase;
+	letter-spacing: 1px;
 }
 
 .summary-item {
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: 15px;
-	font-size: 1.1rem;
+	margin-bottom: 12px;
+	font-size: 0.95rem;
 }
 
 .summary-label {
-	font-weight: 500;
-	color: #ccc;
+	font-weight: 400;
+	color: var(--color-muted);
 }
 
 .price-section {
-	background: rgba(102, 126, 234, 0.1);
-	border-radius: 10px;
+	background: var(--color-primary-dim);
+	border-radius: var(--radius);
 	padding: 20px;
-	border: 2px solid #667eea;
+	border: 1px solid rgba(74, 158, 255, 0.25);
 }
 
 .price-item {
-	font-size: 1.5rem;
+	font-size: 1.3rem;
 	font-weight: 600;
 }
 
 .price-value {
-	color: #667eea;
-	font-size: 2rem;
+	color: var(--color-primary);
+	font-size: 1.7rem;
 }
 
 .reservation-link-container {
 	display: flex;
 	gap: 10px;
 	align-items: center;
-	margin-top: 10px;
+	margin-top: 8px;
 }
 
 .reservation-link-input {
 	flex: 1;
-	padding: 12px;
-	font-size: 1rem;
-	border: 2px solid #667eea;
+	padding: 11px 14px;
+	font-size: 0.9rem;
+	font-family: var(--font);
+	border: 1px solid rgba(74, 158, 255, 0.3);
 	border-radius: 8px;
-	background-color: rgba(102, 126, 234, 0.1);
-	color: #fff;
-	font-family: "Noto Sans Linear A", sans-serif;
+	background: rgba(74, 158, 255, 0.07);
+	color: var(--color-text);
 }
 
 .reservation-link-input:focus {
 	outline: none;
-	border-color: #4caf50;
+	border-color: var(--color-primary);
 }
 
 .copy-btn {
 	display: flex;
 	align-items: center;
-	gap: 5px;
-	padding: 12px 16px;
-	background-color: #667eea;
+	gap: 6px;
+	padding: 11px 16px;
+	background: var(--color-primary);
 	border: none;
 	border-radius: 8px;
 	cursor: pointer;
-	transition: all 0.3s ease;
-	font-size: 0.9rem;
+	transition: background 0.2s ease;
+	font-size: 0.88rem;
 	font-weight: 500;
+	font-family: var(--font);
+	color: #ffffff;
 }
 
 .copy-btn:hover {
-	background-color: #5568d3;
-	transform: translateY(-2px);
-}
-
-.copy-btn:active {
-	transform: translateY(0);
+	background: #5aabff;
 }
 
 .copy-btn svg {
@@ -403,23 +646,47 @@ form select {
 }
 
 #copyFeedback {
-	font-size: 0.9rem;
+	font-size: 0.85rem;
 	font-weight: 600;
 	white-space: nowrap;
+	color: #ffffff;
+}
+
+.cancel-btn {
+	width: 100%;
+	padding: 14px;
+	font-size: 1rem;
+	font-weight: 600;
+	font-family: var(--font);
+	color: white;
+	background: linear-gradient(135deg, #c0392b 0%, #922b21 100%);
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	box-shadow: 0 4px 14px rgba(192, 57, 43, 0.35);
+	letter-spacing: 0.3px;
+}
+
+.cancel-btn:hover {
+	background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+	box-shadow: 0 6px 20px rgba(231, 76, 60, 0.45);
 }
 
 /* ===== Availability Calendar ===== */
 
 #availabilityCalendar {
-	margin-bottom: 48px;
+	margin-bottom: 40px;
 }
 
 #availabilityCalendar h2 {
 	margin-top: 0;
-	margin-bottom: 20px;
-	font-size: 2.5rem;
+	margin-bottom: 18px;
+	font-size: 1.8rem;
+	font-weight: 300;
 	text-align: center;
-	color: #fff;
+	color: var(--color-text);
+	letter-spacing: 1px;
 }
 
 .cal-nav {
@@ -431,18 +698,19 @@ form select {
 }
 
 #calMonthLabel {
-	font-size: 1.1rem;
-	font-weight: 600;
-	color: #fff;
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--color-text);
 	min-width: 180px;
 	text-align: center;
+	letter-spacing: 0.5px;
 }
 
 .cal-nav-btn {
 	background: transparent;
-	border: 1px solid #444;
-	color: #aaa;
-	font-size: 1.2rem;
+	border: 1px solid var(--color-border);
+	color: var(--color-muted);
+	font-size: 1.1rem;
 	padding: 4px 14px;
 	border-radius: 6px;
 	cursor: pointer;
@@ -451,8 +719,8 @@ form select {
 }
 
 .cal-nav-btn:hover {
-	color: #fff;
-	border-color: #667eea;
+	color: var(--color-text);
+	border-color: var(--color-primary);
 }
 
 .cal-grid {
@@ -465,10 +733,11 @@ form select {
 
 .cal-day-name {
 	text-align: center;
-	font-size: 0.8rem;
+	font-size: 0.75rem;
 	font-weight: 600;
-	color: #666;
+	color: var(--color-muted);
 	padding: 6px 0;
+	letter-spacing: 0.5px;
 }
 
 .cal-day {
@@ -477,10 +746,10 @@ form select {
 	align-items: center;
 	justify-content: center;
 	border-radius: 6px;
-	font-size: 0.9rem;
-	color: #bbb;
-	background-color: #1a1a1a;
-	border: 1px solid #2a2a2a;
+	font-size: 0.88rem;
+	color: var(--color-muted);
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid var(--color-border);
 }
 
 .cal-day.cal-empty {
@@ -489,20 +758,20 @@ form select {
 }
 
 .cal-day.cal-reserved {
-	background-color: rgba(192, 57, 43, 0.25);
-	border-color: #922b21;
+	background: rgba(192, 57, 43, 0.2);
+	border-color: rgba(192, 57, 43, 0.5);
 	color: #e74c3c;
 	font-weight: 600;
 }
 
 .cal-day.cal-today {
-	border-color: #667eea;
-	color: #667eea;
+	border-color: var(--color-primary);
+	color: var(--color-primary);
 	font-weight: 700;
 }
 
 .cal-day.cal-reserved.cal-today {
-	background-color: rgba(192, 57, 43, 0.25);
+	background: rgba(192, 57, 43, 0.2);
 	border-color: #e74c3c;
 }
 
@@ -512,8 +781,8 @@ form select {
 	justify-content: center;
 	gap: 24px;
 	margin-top: 16px;
-	font-size: 0.85rem;
-	color: #888;
+	font-size: 0.82rem;
+	color: var(--color-muted);
 }
 
 .cal-legend-item {
@@ -523,36 +792,38 @@ form select {
 }
 
 .cal-legend-dot {
-	width: 14px;
-	height: 14px;
+	width: 13px;
+	height: 13px;
 	border-radius: 4px;
 	border: 1px solid;
 }
 
 .cal-legend-reserved {
-	background-color: rgba(192, 57, 43, 0.25);
-	border-color: #922b21;
+	background: rgba(192, 57, 43, 0.2);
+	border-color: rgba(192, 57, 43, 0.5);
 }
 
 .cal-legend-today {
-	background-color: transparent;
-	border-color: #667eea;
+	background: transparent;
+	border-color: var(--color-primary);
 }
 
 /* ===== Reservation List ===== */
 
 #reservationList h2 {
 	margin-top: 0;
-	margin-bottom: 30px;
-	font-size: 2.5rem;
+	margin-bottom: 24px;
+	font-size: 1.8rem;
+	font-weight: 300;
 	text-align: center;
-	color: #fff;
+	color: var(--color-text);
+	letter-spacing: 1px;
 }
 
 #noReservations {
 	text-align: center;
-	font-size: 1.2rem;
-	color: #888;
+	font-size: 1.1rem;
+	color: var(--color-muted);
 	margin-top: 40px;
 }
 
@@ -562,44 +833,41 @@ form select {
 	margin: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: 12px;
 }
 
 .reservation-list-item {
-	background-color: #1a1a1a;
-	border: 2px solid #333;
-	border-radius: 10px;
-	padding: 20px;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	padding: 18px 20px;
 	cursor: pointer;
-	transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .reservation-list-item:hover {
-	border-color: #667eea;
-	transform: translateY(-2px);
-	box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-}
-
-.reservation-list-item:active {
-	transform: translateY(0);
+	border-color: rgba(74, 158, 255, 0.4);
+	background: var(--color-surface-hover);
+	box-shadow: 0 4px 20px rgba(74, 158, 255, 0.12);
 }
 
 .list-item-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: baseline;
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 }
 
 .list-item-name {
-	font-size: 1.2rem;
+	font-size: 1rem;
 	font-weight: 600;
+	color: var(--color-text);
 }
 
 .list-item-price {
-	font-size: 1.3rem;
+	font-size: 1.1rem;
 	font-weight: 700;
-	color: #667eea;
+	color: var(--color-primary);
 }
 
 .list-item-details {
@@ -607,9 +875,9 @@ form select {
 	justify-content: space-between;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 6px;
-	font-size: 0.95rem;
-	color: #aaa;
+	gap: 4px;
+	font-size: 0.88rem;
+	color: var(--color-muted);
 }
 
 .list-item-meta {
@@ -623,79 +891,20 @@ form select {
 	display: none;
 	margin-bottom: 20px;
 	padding: 8px 16px;
-	font-size: 1rem;
-	font-family: inherit;
-	font-weight: 500;
-	color: #aaa;
+	font-size: 0.9rem;
+	font-family: var(--font);
+	font-weight: 400;
+	color: var(--color-muted);
 	background: transparent;
-	border: 1px solid #444;
-	border-radius: 8px;
+	border: 1px solid var(--color-border);
+	border-radius: 6px;
 	cursor: pointer;
 	transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 #backToList:hover {
-	color: #fff;
-	border-color: #667eea;
-}
-
-/* ===== Availability Bar ===== */
-
-#availability-bar {
-	display: flex;
-	align-items: center;
-	gap: 0;
-	background-color: #0a2440;
-	padding: 12px 20px;
-	width: 100%;
-	box-sizing: border-box;
-}
-
-#availability-bar input {
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-size: 1rem;
-	padding: 12px 15px;
-	border: 1px solid #444;
-	border-right: none;
-	background-color: #1a1a1a;
-	color: white;
-	outline: none;
-}
-
-#availability-bar :first-child {
-	border-radius: 8px 0 0 8px;
-}
-
-
-
-.availabilityBarLabel{
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-size: 1rem;
-	padding: 12px 20px;
-	background-color: #202327;
-	color: white;
-	border-radius: 0 8px 8px 0;
-	white-space: nowrap;
-}
-
-#availability-bar input:last-of-type {
-	border-right: 1px solid #444;
-}
-
-#availability-bar button {
-	font-family: "Noto Sans Linear A", sans-serif;
-	font-size: 1rem;
-	padding: 12px 20px;
-	background-color: #1a56a0;
-	color: white;
-	border: none;
-	border-radius: 0 8px 8px 0;
-	cursor: pointer;
-	white-space: nowrap;
-}
-
-#availability-bar button:hover {
-	background-color: #2468c0;
+	color: var(--color-text);
+	border-color: var(--color-primary);
 }
 
 /* ===== Booking Form Step 1 - Inline Inputs ===== */
@@ -713,7 +922,7 @@ form select {
 
 .availability-bar-inline .form-group label {
 	margin-bottom: 4px;
-	font-size: 0.9rem;
+	font-size: 0.8rem;
 }
 
 .availability-bar-inline .form-group input {
@@ -726,7 +935,7 @@ form select {
 }
 
 .availability-bar-inline .form-group:last-of-type input {
-	border-right: 2px solid #444;
+	border-right: 1px solid var(--color-border);
 }
 
 .availability-bar-inline .submit-btn {
@@ -735,6 +944,109 @@ form select {
 	margin: 0;
 	width: auto;
 	height: fit-content;
-	padding: 12px 20px;
-	font-size: 1rem;
+	padding: 11px 20px;
+	font-size: 0.9rem;
+}
+
+/* ===== Cancel Modal ===== */
+
+#cancelModal {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#cancelModalBackdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.65);
+	backdrop-filter: blur(4px);
+}
+
+#cancelModalContent {
+	position: relative;
+	background: #0d2145;
+	border: 1px solid rgba(74, 158, 255, 0.2);
+	border-radius: 14px;
+	padding: 32px;
+	max-width: 480px;
+	width: 90%;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	font-family: var(--font);
+}
+
+#cancelModalContent h3 {
+	margin: 0 0 10px;
+	font-size: 1.25rem;
+	font-weight: 500;
+	color: #e74c3c;
+}
+
+#cancelModalContent p {
+	margin: 0 0 20px;
+	font-size: 0.9rem;
+	color: var(--color-muted);
+}
+
+.cancel-modal-field {
+	margin-bottom: 24px;
+}
+
+.cancel-modal-field label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 0.82rem;
+	font-weight: 500;
+	color: var(--color-muted);
+	letter-spacing: 0.3px;
+}
+
+.cancel-modal-field textarea {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 10px 13px;
+	border: 1px solid var(--color-border);
+	border-radius: 8px;
+	font-size: 0.9rem;
+	font-family: var(--font);
+	resize: vertical;
+	background: rgba(255, 255, 255, 0.06);
+	color: var(--color-text);
+}
+
+.cancel-modal-field textarea:focus {
+	outline: none;
+	border-color: rgba(74, 158, 255, 0.5);
+}
+
+.cancel-modal-buttons {
+	display: flex;
+	gap: 12px;
+}
+
+.cancel-modal-buttons .cancel-btn {
+	flex: 1;
+	padding: 12px;
+	font-size: 0.95rem;
+}
+
+.cancel-modal-close-btn {
+	flex: 1;
+	padding: 12px;
+	font-size: 0.95rem;
+	font-weight: 500;
+	font-family: var(--font);
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid var(--color-border);
+	border-radius: 8px;
+	cursor: pointer;
+	color: var(--color-text);
+	transition: background 0.2s ease;
+}
+
+.cancel-modal-close-btn:hover {
+	background: rgba(255, 255, 255, 0.13);
 }

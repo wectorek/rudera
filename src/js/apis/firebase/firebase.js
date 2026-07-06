@@ -85,3 +85,8 @@ onAuthStateChanged(auth, (user) => {
 		document.getElementById("myReservation").style.display = "none";
 	}
 });
+
+export const ADMIN_EMAIL = "wectorek9@onet.pl";
+export function isAdmin(user) {
+	return user?.email === ADMIN_EMAIL;
+}
