@@ -326,7 +326,7 @@ body {
 }
 
 #hero-booking #bookingForm,
-#hero-content > * {
+#hero-content {
 	background: rgba(10, 25, 55, 0.82);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
@@ -340,7 +340,7 @@ body {
 /* ===== Page Container ===== */
 
 #page-container {
-	display: flex;
+	display: none;
 	flex-direction: column;
 	align-items: center;
 	padding: 40px 24px 60px;

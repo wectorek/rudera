@@ -67,12 +67,22 @@ onAuthStateChanged(auth, (user) => {
 		console.log("Zdjęcie:", user.photoURL);
 		if (authStatus) authStatus.textContent = "";
 		if (userDisplay) {
-			userDisplay.textContent = user.displayName || user.email;
+			const adminSuffix = isAdmin(user) ? " (Admin)" : "";
+			userDisplay.textContent = (user.displayName || user.email) + adminSuffix;
 			userDisplay.style.display = "";
 		}
 		loginBtn.style.display = "none";
 		logoutBtn.style.display = "";
-		document.getElementById("myReservation").style.display = "";
+		const myResBtn = document.getElementById("myReservation");
+		myResBtn.style.display = "";
+		const myResBtnLabel = document.getElementById("myReservationLabel");
+		if (myResBtnLabel) {
+			myResBtnLabel.textContent = isAdmin(user) ? "Zarządzanie rezerwacjami" : "Moja rezerwacja";
+		}
+		const availabilityBar = document.getElementById("availability-bar");
+		if (availabilityBar) {
+			availabilityBar.style.display = isAdmin(user) ? "none" : "";
+		}
 	} else {
 		console.log("Użytkownik wylogowany");
 		if (authStatus) authStatus.textContent = "";
@@ -83,6 +93,8 @@ onAuthStateChanged(auth, (user) => {
 		loginBtn.style.display = "";
 		logoutBtn.style.display = "none";
 		document.getElementById("myReservation").style.display = "none";
+		const availabilityBar = document.getElementById("availability-bar");
+		if (availabilityBar) availabilityBar.style.display = "";
 	}
 });
 
