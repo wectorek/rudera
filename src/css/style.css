@@ -176,7 +176,7 @@ body {
 #hero {
 	position: relative;
 	min-height: calc(100vh - var(--navbar-height));
-	background-image: url("../resources/panorama.jpeg");
+	background-image: url("../resources/panoraman.jpeg");
 	background-size: cover;
 	background-position: center;
 	display: flex;
