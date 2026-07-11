@@ -23,6 +23,33 @@ export function initApp() {
 	const contactButton = document.getElementById(subpages.contact);
 	const myReservationButton = document.getElementById(subpages.myReservation);
 
+	// Hamburger menu
+	const hamburgerBtn = document.getElementById("hamburger-btn");
+	const navbar = document.getElementById("navbar");
+
+	function closeMenu() {
+		navbar.classList.remove("menu-open");
+		if (hamburgerBtn) {
+			hamburgerBtn.setAttribute("aria-expanded", "false");
+			hamburgerBtn.querySelector("i").className = "fas fa-bars";
+		}
+	}
+
+	if (hamburgerBtn) {
+		hamburgerBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
+			const isOpen = navbar.classList.toggle("menu-open");
+			hamburgerBtn.setAttribute("aria-expanded", String(isOpen));
+			hamburgerBtn.querySelector("i").className = isOpen ? "fas fa-times" : "fas fa-bars";
+		});
+
+		document.addEventListener("click", (e) => {
+			if (!navbar.contains(e.target)) {
+				closeMenu();
+			}
+		});
+	}
+
 	for (const button of [
 		areaDescriptionButton,
 		foresterDescriptionButton,
@@ -30,6 +57,7 @@ export function initApp() {
 		myReservationButton,
 	]) {
 		button.addEventListener("click", async () => {
+			closeMenu();
 			currentButton = await showSubpage(button, currentButton);
 		});
 	}

@@ -20,4 +20,3 @@ To do:
 Dodać kalendarz rezerwacji jako zakładka. System wyświetla dany dzień na czerwono, jeżeli znajduję się on w rezerwacjach zaakceptowanych przez gospodarza. Nie da się stworzyć rezerwacji, jeśli którykolwiek z dni jest już zajęty.
 Naprawić i zaktualizować podstrony.
 Dodać mapę.
-67

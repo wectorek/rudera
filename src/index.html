@@ -13,35 +13,38 @@
 		<div id="navbar">
 			<div id="navbar-left">
 				<div id="navbar-title">cisówek-leśniczówka.pl</div>
-				<div id="navigation">
-					<button
-						id="myReservation"
-						class="navigation-button"
-						style="display: none"
-					>
-						<i class="fas fa-calendar-check"></i><span id="myReservationLabel">Moja rezerwacja</span>
-					</button>
-					<button id="foresterDescription" class="navigation-button">
-						<i class="fas fa-house"></i>Opis leśniczówki
-					</button>
-					<button
-						id="areaDescription"
-						class="navigation-button"
-					>
-						<i class="fas fa-map-marked-alt"></i>Okolica
-					</button>
-					<button id="contact" class="navigation-button"><i class="fas fa-phone"></i>Kontakt</button>
-					<div id="underline"></div>
-				</div>
 			</div>
+			<div id="navigation">
+				<button
+					id="myReservation"
+					class="navigation-button"
+					style="display: none"
+				>
+					<i class="fas fa-calendar-check"></i><span id="myReservationLabel">Moja rezerwacja</span>
+				</button>
+				<button id="foresterDescription" class="navigation-button">
+					<i class="fas fa-house"></i><span class="nav-label">Opis leśniczówki</span>
+				</button>
+				<button
+					id="areaDescription"
+					class="navigation-button"
+				>
+					<i class="fas fa-map-marked-alt"></i><span class="nav-label">Okolica</span>
+				</button>
+				<button id="contact" class="navigation-button"><i class="fas fa-phone"></i><span class="nav-label">Kontakt</span></button>
+				<div id="underline"></div>
+			</div>
+			<button id="hamburger-btn" aria-label="Otwórz menu" aria-expanded="false">
+				<i class="fas fa-bars"></i>
+			</button>
 			<div id="navbar-right">
-				<button id="login" class="navigation-button"><i class="fas fa-right-to-bracket"></i>Zaloguj</button>
+				<button id="login" class="navigation-button"><i class="fas fa-right-to-bracket"></i><span class="nav-label">Zaloguj</span></button>
 				<button
 					id="logout"
 					class="navigation-button"
 					style="display: none"
 				>
-					<i class="fas fa-right-from-bracket"></i>Wyloguj
+					<i class="fas fa-right-from-bracket"></i><span class="nav-label">Wyloguj</span>
 				</button>
 				<span id="user-display" style="display: none;"></span>
 			</div>
