@@ -1,66 +1,87 @@
-<form id="bookingForm">
-	<h2>Rezerwacja</h2>
-	<button type="button" id="fillTestData" class="fill-test-btn">Wypełnij danymi testowymi</button>
+<div id="bookingView">
+	<form id="bookingForm">
+		<h2>Rezerwacja</h2>
+		<button type="button" id="fillTestData" class="fill-test-btn">Wypełnij danymi testowymi</button>
 
-	<div id="bookingStep1">
-		<div class="availability-bar-inline">
-			<div class="form-group">
-				<label for="checkIn">Data przyjazdu</label>
-				<input type="date" id="checkIn" name="checkIn" required />
+		<div id="bookingStep1">
+			<div class="availability-bar-inline">
+				<div class="form-group">
+					<label for="checkIn">Data przyjazdu</label>
+					<input type="date" id="checkIn" name="checkIn" required />
+				</div>
+				<div class="form-group">
+					<label for="checkOut">Data wyjazdu</label>
+					<input type="date" id="checkOut" name="checkOut" required />
+				</div>
+				<div class="form-group">
+					<label for="adults">Dorośli</label>
+					<input type="number" id="adults" name="adults" min="1" max="10" value="1" required />
+				</div>
+				<div class="form-group">
+					<label for="children">Osoby do lat 13</label>
+					<input type="number" id="children" name="children" min="0" max="10" value="0" required />
+				</div>
 			</div>
-			<div class="form-group">
-				<label for="checkOut">Data wyjazdu</label>
-				<input type="date" id="checkOut" name="checkOut" required />
+		</div>
+
+		<div id="bookingStep2">
+			<div class="form-section">
+				<h3>Dane kontaktowe</h3>
+				<div class="form-group">
+					<label for="firstName">Imię</label>
+					<input type="text" id="firstName" name="firstName" required />
+				</div>
+				<div class="form-group">
+					<label for="lastName">Nazwisko</label>
+					<input type="text" id="lastName" name="lastName" required />
+				</div>
+				<div class="form-group">
+					<label for="phone">Numer telefonu</label>
+					<input type="tel" id="phone" name="phone" required />
+				</div>
+				<div class="form-group">
+					<label for="email">Email</label>
+					<input type="email" id="email" name="email" required />
+				</div>
 			</div>
-			<div class="form-group">
-				<label for="guests">Liczba osób</label>
-				<input type="number" id="guests" name="guests" min="1" max="5" required />
+
+			<div id="bookingPricePreview" class="booking-price-preview">
+				<span class="booking-price-label">Cena pobytu:</span>
+				<span id="bookingPriceValue" class="booking-price-value">0 zł</span>
 			</div>
-			<button type="button" id="checkAvailabilityForm" class="submit-btn">Sprawdź dostępność</button>
+
+			<button type="submit" class="submit-btn">Zarezerwuj pobyt</button>
+		</div>
+	</form>
+
+	<div id="availabilityCalendar">
+		<h2>Dostępność</h2>
+		<div class="cal-nav">
+			<button type="button" class="cal-nav-btn" id="calPrev">&#8592;</button>
+			<span id="calMonthLabel"></span>
+			<button type="button" class="cal-nav-btn" id="calNext">&#8594;</button>
+		</div>
+		<div class="cal-grid" id="calGrid"></div>
+		<div class="cal-legend">
+			<div class="cal-legend-item">
+				<span class="cal-legend-dot cal-legend-reserved"></span>
+				<span>Zarezerwowane</span>
+			</div>
+			<div class="cal-legend-item">
+				<span class="cal-legend-dot cal-legend-today"></span>
+				<span>Dzisiaj</span>
+			</div>
 		</div>
 	</div>
+</div>
 
-	<div id="bookingStep2" style="display: none;">
-		<div class="form-section">
-			<h3>Dodatkowe atrakcje</h3>
-			<div class="checkbox-group">
-				<input type="checkbox" id="bikeRental" name="bikeRental" />
-				<label for="bikeRental">Wypożyczenie rowerów (50 zł/doba)</label>
-			</div>
-			<div class="checkbox-group">
-				<input type="checkbox" id="kayakRental" name="kayakRental" />
-				<label for="kayakRental">Wypożyczenie kajaków (80 zł/doba)</label>
-			</div>
-			<div class="checkbox-group">
-				<input type="checkbox" id="campfire" name="campfire" />
-				<label for="campfire">Ognisko z opieką (100 zł)</label>
-			</div>
-			<div class="checkbox-group">
-				<input type="checkbox" id="pets" name="pets" />
-				<label for="pets">Zwierzęta (50 zł/doba)</label>
-			</div>
+<div id="occupiedModal" style="display:none">
+	<div id="occupiedModalBackdrop"></div>
+	<div id="occupiedModalContent">
+		<h3>Termin zajęty</h3>
+		<p id="occupiedModalMessage">Wybrany termin jest już zarezerwowany. Wybierz inne daty.</p>
+		<div class="occupied-modal-buttons">
+			<button type="button" id="occupiedModalClose" class="occupied-modal-close-btn">Zamknij</button>
 		</div>
-
-		<div class="form-section">
-			<h3>Dane kontaktowe</h3>
-			<div class="form-group">
-				<label for="firstName">Imię</label>
-				<input type="text" id="firstName" name="firstName" required />
-			</div>
-			<div class="form-group">
-				<label for="lastName">Nazwisko</label>
-				<input type="text" id="lastName" name="lastName" required />
-			</div>
-			<div class="form-group">
-				<label for="phone">Numer telefonu</label>
-				<input type="tel" id="phone" name="phone" required />
-			</div>
-			<div class="form-group">
-				<label for="email">Email</label>
-				<input type="email" id="email" name="email" required />
-			</div>
-		</div>
-
-		<button type="submit" class="submit-btn">Zarezerwuj pobyt</button>
 	</div>
-</form>
+</div>

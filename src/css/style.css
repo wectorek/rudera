@@ -345,7 +345,7 @@ body {
 	opacity: 1;
 }
 
-#hero-booking #bookingForm,
+#hero-booking #bookingView,
 #hero-content {
 	background: rgba(10, 25, 55, 0.82);
 	backdrop-filter: blur(20px);
@@ -355,6 +355,11 @@ body {
 	padding: 32px 36px;
 	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(74, 158, 255, 0.08);
 	margin-top: 16px;
+}
+
+#hero-booking:has(#bookingView),
+#hero-content:has(#bookingView) {
+	width: min(980px, 100%);
 }
 
 /* ===== Page Container ===== */
@@ -398,6 +403,18 @@ body {
 }
 
 /* ===== Booking Form ===== */
+
+#bookingView {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+	gap: 40px;
+	align-items: start;
+}
+
+#bookingView #availabilityCalendar {
+	margin-bottom: 0;
+	padding-top: 8px;
+}
 
 .img-wrap {
 	position: relative;
@@ -551,6 +568,30 @@ body {
 	text-align: center;
 	color: var(--color-text);
 	letter-spacing: 1px;
+}
+
+.booking-price-preview {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	margin: 8px 0 20px;
+	padding: 16px 18px;
+	border-radius: 10px;
+	background: var(--color-primary-dim);
+	border: 1px solid rgba(74, 158, 255, 0.25);
+}
+
+.booking-price-label {
+	font-size: 0.95rem;
+	color: var(--color-muted);
+	letter-spacing: 0.3px;
+}
+
+.booking-price-value {
+	font-size: 1.45rem;
+	font-weight: 600;
+	color: var(--color-primary);
 }
 
 /* ===== Reservation Summary ===== */
@@ -956,16 +997,7 @@ body {
 
 .availability-bar-inline .form-group:last-of-type input {
 	border-right: 1px solid var(--color-border);
-}
-
-.availability-bar-inline .submit-btn {
 	border-radius: 0 8px 8px 0;
-	white-space: nowrap;
-	margin: 0;
-	width: auto;
-	height: fit-content;
-	padding: 11px 20px;
-	font-size: 0.9rem;
 }
 
 /* ===== Cancel Modal ===== */
@@ -1071,6 +1103,74 @@ body {
 	background: rgba(255, 255, 255, 0.13);
 }
 
+/* ===== Occupied date modal ===== */
+
+#occupiedModal {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#occupiedModalBackdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.65);
+	backdrop-filter: blur(4px);
+}
+
+#occupiedModalContent {
+	position: relative;
+	background: #0d2145;
+	border: 1px solid rgba(231, 76, 60, 0.35);
+	border-radius: 14px;
+	padding: 32px;
+	max-width: 420px;
+	width: 90%;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	font-family: var(--font);
+	text-align: center;
+}
+
+#occupiedModalContent h3 {
+	margin: 0 0 10px;
+	font-size: 1.25rem;
+	font-weight: 500;
+	color: #e74c3c;
+}
+
+#occupiedModalContent p {
+	margin: 0 0 24px;
+	font-size: 0.95rem;
+	color: var(--color-muted);
+	line-height: 1.5;
+}
+
+.occupied-modal-buttons {
+	display: flex;
+	justify-content: center;
+}
+
+.occupied-modal-close-btn {
+	min-width: 140px;
+	padding: 12px 20px;
+	font-size: 0.95rem;
+	font-weight: 500;
+	font-family: var(--font);
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid var(--color-border);
+	border-radius: 8px;
+	cursor: pointer;
+	color: var(--color-text);
+	transition: background 0.2s ease;
+}
+
+.occupied-modal-close-btn:hover {
+	background: rgba(255, 255, 255, 0.13);
+}
+
 /* ===== Responsive ===== */
 
 /* Tablet */
@@ -1088,6 +1188,11 @@ body {
 
 	#navbar-right {
 		padding-right: 16px;
+	}
+
+	#bookingView {
+		grid-template-columns: 1fr;
+		gap: 28px;
 	}
 }
 
@@ -1229,9 +1334,14 @@ body {
 	}
 
 	/* ----- Hero inline sections ----- */
-	#hero-booking #bookingForm,
+	#hero-booking #bookingView,
 	#hero-content {
 		padding: 24px 16px;
+	}
+
+	#bookingView {
+		grid-template-columns: 1fr;
+		gap: 28px;
 	}
 
 	/* ----- Page container ----- */
@@ -1253,12 +1363,6 @@ body {
 	.availability-bar-inline .form-group input {
 		border-radius: 8px !important;
 		border-right: 1px solid var(--color-border) !important;
-	}
-
-	.availability-bar-inline .submit-btn {
-		border-radius: 8px;
-		width: 100%;
-		padding: 12px;
 	}
 
 	/* ----- Headings ----- */

@@ -1,92 +1,15 @@
 import { Reservation } from "../reservation.js";
 import { initCopyButton } from "./copyButton.js";
+import {
+	initReservationCalendar,
+	isDateRangeAvailable,
+} from "./calendar.js";
 
-// ===== Kalendarz dostępności =====
-
-function buildReservedSet(dates) {
-	const set = new Set();
-	for (const { arrivalDate, departureDate } of dates) {
-		const start = new Date(arrivalDate);
-		const end = new Date(departureDate);
-		for (const d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
-			set.add(d.toISOString().split("T")[0]);
-		}
-	}
-	return set;
+function addDaysIso(dateStr, days) {
+	const date = new Date(dateStr);
+	date.setDate(date.getDate() + days);
+	return date.toISOString().split("T")[0];
 }
-
-function renderCalendar(reservedSet, year, month) {
-	const grid = document.getElementById("calGrid");
-	const label = document.getElementById("calMonthLabel");
-	if (!grid || !label) return;
-
-	const monthNames = [
-		"Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
-		"Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień",
-	];
-	label.textContent = `${monthNames[month]} ${year}`;
-	grid.innerHTML = "";
-
-	["Pn","Wt","Śr","Cz","Pt","So","Nd"].forEach((name) => {
-		const cell = document.createElement("div");
-		cell.className = "cal-day-name";
-		cell.textContent = name;
-		grid.appendChild(cell);
-	});
-
-	const startOffset = (new Date(year, month, 1).getDay() + 6) % 7;
-	for (let i = 0; i < startOffset; i++) {
-		const empty = document.createElement("div");
-		empty.className = "cal-day cal-empty";
-		grid.appendChild(empty);
-	}
-
-	const daysInMonth = new Date(year, month + 1, 0).getDate();
-	const today = new Date().toISOString().split("T")[0];
-
-	for (let day = 1; day <= daysInMonth; day++) {
-		const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-		const cell = document.createElement("div");
-		cell.className = "cal-day";
-		cell.textContent = day;
-		if (reservedSet.has(dateStr)) cell.classList.add("cal-reserved");
-		if (dateStr === today) cell.classList.add("cal-today");
-		grid.appendChild(cell);
-	}
-}
-
-async function initReservationCalendar() {
-	let reservedSet = new Set();
-
-	try {
-		const response = await fetch("http://localhost:3000/reserved-dates");
-		if (response.ok) {
-			const dates = await response.json();
-			reservedSet = buildReservedSet(dates);
-		} else {
-			console.warn("Kalendarz: serwer zwrócił błąd", response.status);
-		}
-	} catch (err) {
-		console.warn("Kalendarz: nie można pobrać zarezerwowanych dat:", err.message);
-	}
-
-	let currentYear = new Date().getFullYear();
-	let currentMonth = new Date().getMonth();
-
-	renderCalendar(reservedSet, currentYear, currentMonth);
-
-	document.getElementById("calPrev")?.addEventListener("click", () => {
-		currentMonth--;
-		if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-		renderCalendar(reservedSet, currentYear, currentMonth);
-	});
-	document.getElementById("calNext")?.addEventListener("click", () => {
-		currentMonth++;
-		if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-		renderCalendar(reservedSet, currentYear, currentMonth);
-	});
-}
-
 // Flaga do śledzenia czy formularz rezerwacji został zainicjalizowany
 let bookingFormInitialized = false;
 let bookingContentLoaded = false;
@@ -103,7 +26,7 @@ async function loadSubpageContent(subpageId) {
 	}
 
 	// Załaduj z pliku w folderze pages
-	const response = await fetch(`src/pages/${subpageId}.html`);
+	const response = await fetch(`/pages/${subpageId}.html`);
 	const html = await response.text();
 	
 	// Zapisz w cache
@@ -178,15 +101,17 @@ export async function showSubpage(
 		if (!heroContentElement.querySelector("#bookingForm")) {
 			const html = await loadSubpageContent("booking");
 			heroContentElement.innerHTML = html;
+			bookingFormInitialized = false;
 		}
 		if (!bookingFormInitialized) {
 			Reservation.initBookingForm();
 			bookingFormInitialized = true;
 		}
+		await initReservationCalendar();
 		heroContentElement.classList.add("visible");
 	} else if (subpageId === "myReservation") {
 		// Świeża kopia — reset widoku
-		const response = await fetch("src/pages/myReservation.html");
+		const response = await fetch("/pages/myReservation.html");
 		heroContentElement.innerHTML = await response.text();
 		initCopyButton();
 		heroContentElement.classList.add("visible");
@@ -231,14 +156,32 @@ export function initAvailabilityBar() {
 	const btn = document.getElementById("checkAvailability");
 	if (!btn) return;
 
+	const quickCheckIn = document.getElementById("quickCheckIn");
+	const quickCheckOut = document.getElementById("quickCheckOut");
+
+	quickCheckIn?.addEventListener("change", () => {
+		if (!quickCheckIn.value || !quickCheckOut) return;
+		const minCheckout = addDaysIso(quickCheckIn.value, 1);
+		quickCheckOut.min = minCheckout;
+		if (quickCheckOut.value && quickCheckOut.value <= quickCheckIn.value) {
+			quickCheckOut.value = minCheckout;
+		}
+	});
+
 	btn.addEventListener("click", async () => {
 		console.log("Sprawdzanie dostępności...");
 		const checkIn = document.getElementById("quickCheckIn").value;
 		const checkOut = document.getElementById("quickCheckOut").value;
-		const guests = document.getElementById("quickGuests").value;
+		const adults = document.getElementById("quickAdults").value;
+		const children = document.getElementById("quickChildren").value;
 
-		if (!checkIn || !checkOut || !guests) {
+		if (!checkIn || !checkOut || adults === "" || children === "") {
 			alert("Wypełnij wszystkie pola.");
+			return;
+		}
+
+		if (!Reservation.isValidDateRange(checkIn, checkOut)) {
+			alert("Data wyjazdu musi być późniejsza niż data przyjazdu.");
 			return;
 		}
 
@@ -247,6 +190,7 @@ export function initAvailabilityBar() {
 		if (!heroBookingElement.innerHTML.trim()) {
 			const html = await loadSubpageContent("booking");
 			heroBookingElement.innerHTML = html;
+			heroBookingInitialized = false;
 		}
 
 		if (!heroBookingInitialized) {
@@ -254,20 +198,29 @@ export function initAvailabilityBar() {
 			heroBookingInitialized = true;
 		}
 
-		// Przepisz wartości i pokaż krok 2
+		await initReservationCalendar();
+
 		document.getElementById("checkIn").value = checkIn;
 		document.getElementById("checkOut").value = checkOut;
-		document.getElementById("guests").value = guests;
-		document.getElementById("bookingStep2").style.display = "block";
+		document.getElementById("adults").value = adults;
+		document.getElementById("children").value = children;
+		Reservation.syncCheckoutMinDate();
 
-		// Ukryj hero-content przy otwieraniu availability bar
+		const available = await isDateRangeAvailable(checkIn, checkOut);
+		Reservation.updateBookingPricePreview();
+
 		const heroContentEl = document.getElementById("hero-content");
 		if (heroContentEl) {
 			heroContentEl.classList.remove("visible");
 		}
 
-		// Rozwiń hero-booking
 		heroBookingElement.classList.add("visible");
 		heroBookingElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+		if (!available) {
+			Reservation.showOccupiedPopup(
+				"Wybrany termin jest już zarezerwowany. Wybierz inne daty.",
+			);
+		}
 	});
 }
