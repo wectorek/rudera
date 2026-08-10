@@ -4,10 +4,28 @@ import {
 	collection,
 	addDoc,
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import { APIKey } from "../../../secrets/firebaseAPIKey.js";
+// Klucz apiKey w konfiguracji Firebase Web SDK nie jest "tajny" w sensie
+// autoryzacji (zawsze widoczny w devtools klienta), ale mimo to trzymamy go
+// poza repo i ładujemy w runtime z Pages Function `/api/firebase-config`
+// (functions/api/firebase-config.js), która czyta zmienną `FIREBASE_API_KEY`.
+//
+// Ustawianie wartości — analogicznie jak w repo rudera-backend:
+//  - lokalnie: plik `.dev.vars` w korzeniu repo (gitignorowany), na wzór
+//    `.dev.vars.example`, odczytywany automatycznie przez
+//    `wrangler pages dev src` (patrz README/skrypt "dev").
+//  - na produkcji: Cloudflare Pages -> Settings -> Environment variables ->
+//    dodaj sekret `FIREBASE_API_KEY`.
+async function getFirebaseApiKey() {
+	const response = await fetch("/api/firebase-config");
+	if (!response.ok) {
+		throw new Error("Nie udało się pobrać konfiguracji Firebase (/api/firebase-config).");
+	}
+	const { apiKey } = await response.json();
+	return apiKey;
+}
 
 const firebaseConfig = {
-	apiKey: APIKey,
+	apiKey: await getFirebaseApiKey(),
 	authDomain: "rudera-587be.firebaseapp.com",
 	projectId: "rudera-587be",
 	storageBucket: "rudera-587be.firebasestorage.app",

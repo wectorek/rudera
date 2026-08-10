@@ -1,0 +1,11 @@
+{
+  "name": "rudera-frontend",
+  "private": true,
+  "devDependencies": {
+    "wrangler": "^4.113.0"
+  },
+  "scripts": {
+    "dev": "wrangler pages dev src",
+    "deploy": "wrangler pages deploy src"
+  }
+}
