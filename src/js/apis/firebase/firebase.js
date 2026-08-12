@@ -18,7 +18,7 @@ async function getFirebaseApiKey() {
 	const { apiKey } = await response.json();
 	return apiKey;
 }
-
+//67
 const firebaseConfig = {
 	apiKey: await getFirebaseApiKey(),
 	authDomain: "rudera-587be.firebaseapp.com",
