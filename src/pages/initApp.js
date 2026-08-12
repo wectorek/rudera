@@ -64,12 +64,19 @@ export function initApp() {
 
 	// Inicjalizacja pozycji linii przy starcie
 	window.addEventListener("load", async () => {
-		currentButton = await showSubpage(
-			currentButton,
-			currentButton,
-			false,
-		); // false = nie aktualizuj URL przy inicjalizacji
-		initAvailabilityBar();
+		console.log("[initApp] window.load — start");
+		try {
+			currentButton = await showSubpage(
+				currentButton,
+				currentButton,
+				false,
+			); // false = nie aktualizuj URL przy inicjalizacji
+			console.log("[initApp] showSubpage done, initAvailabilityBar...");
+			initAvailabilityBar();
+			console.log("[initApp] window.load — done");
+		} catch (error) {
+			console.error("[initApp] błąd przy starcie:", error);
+		}
 	});
 
 	// Obsługa przycisku "wstecz" i "dalej" w przeglądarce

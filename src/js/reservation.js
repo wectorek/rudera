@@ -404,6 +404,7 @@ export class Reservation {
 
 	static initBookingForm() {
 		const bookingForm = document.getElementById("bookingForm");
+		console.log("[booking] initBookingForm, form found:", !!bookingForm);
 
 		if (bookingForm) {
 			const fillBtn = document.getElementById("fillTestData");
@@ -437,66 +438,84 @@ export class Reservation {
 
 			bookingForm.addEventListener("submit", async (event) => {
 				event.preventDefault();
+				console.log("[booking] submit formularza rezerwacji");
 
-				const formData = new FormData(bookingForm);
-				const arrivalDate = formData.get("checkIn");
-				const departureDate = formData.get("checkOut");
+				try {
+					const formData = new FormData(bookingForm);
+					const arrivalDate = formData.get("checkIn");
+					const departureDate = formData.get("checkOut");
+					console.log("[booking] daty:", { arrivalDate, departureDate });
 
-				if (!Reservation.isValidDateRange(arrivalDate, departureDate)) {
-					alert("Data wyjazdu musi być późniejsza niż data przyjazdu.");
-					return;
+					if (!Reservation.isValidDateRange(arrivalDate, departureDate)) {
+						console.warn("[booking] nieprawidłowy zakres dat");
+						alert("Data wyjazdu musi być późniejsza niż data przyjazdu.");
+						return;
+					}
+
+					const reservationData = {
+						arrivalDate,
+						departureDate,
+						numberOfAdults: parseInt(formData.get("adults"), 10),
+						numberOfChildren: parseInt(formData.get("children"), 10),
+						firstName: formData.get("firstName"),
+						lastName: formData.get("lastName"),
+						phone: formData.get("phone"),
+						email: formData.get("email"),
+						userId: auth.currentUser?.uid || null,
+					};
+					console.log("[booking] reservationData:", reservationData);
+
+					const reservation = new Reservation(reservationData);
+					const plainObj = reservation.toPlainObject();
+					const currentUser = auth.currentUser;
+					if (currentUser) {
+						plainObj.userId = currentUser.uid;
+					}
+
+					const url = buildApiUrl("/make-reservation");
+					console.log("[booking] POST", url, plainObj);
+					const response = await fetch(url, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(plainObj),
+					});
+					console.log("[booking] /make-reservation status:", response.status);
+
+					if (response.status === 409) {
+						const { error } = await response.json();
+						console.warn("[booking] konflikt 409:", error);
+						Reservation.showOccupiedPopup(
+							error || "Wybrany termin jest już zajęty. Wybierz inne daty.",
+						);
+						return;
+					}
+
+					if (response.status === 400) {
+						const { error } = await response.json();
+						console.warn("[booking] błąd walidacji 400:", error);
+						alert(error || "Nieprawidłowe dane rezerwacji.");
+						return;
+					}
+
+					if (!response.ok) {
+						const bodyText = await response.text().catch(() => "");
+						console.error("[booking] błąd HTTP", response.status, bodyText);
+						alert("Wystąpił błąd podczas tworzenia rezerwacji. Spróbuj ponownie.");
+						return;
+					}
+
+					const { reservationId } = await response.json();
+					console.log("[booking] RESERVATION CREATED:", reservationId);
+
+					bookingForm.reset();
+					document.getElementById("myReservation").click();
+				} catch (error) {
+					console.error("[booking] błąd podczas tworzenia rezerwacji:", error);
+					alert("Wystąpił błąd podczas tworzenia rezerwacji. Sprawdź konsolę.");
 				}
-
-				const reservationData = {
-					arrivalDate,
-					departureDate,
-					numberOfAdults: parseInt(formData.get("adults"), 10),
-					numberOfChildren: parseInt(formData.get("children"), 10),
-					firstName: formData.get("firstName"),
-					lastName: formData.get("lastName"),
-					phone: formData.get("phone"),
-					email: formData.get("email"),
-					userId: auth.currentUser?.uid || null,
-				};
-
-				const reservation = new Reservation(reservationData);
-				const plainObj = reservation.toPlainObject();
-				const currentUser = auth.currentUser;
-				if (currentUser) {
-					plainObj.userId = currentUser.uid;
-				}
-
-				const response = await fetch(buildApiUrl("/make-reservation"), {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(plainObj),
-				});
-
-				if (response.status === 409) {
-					const { error } = await response.json();
-					Reservation.showOccupiedPopup(
-						error || "Wybrany termin jest już zajęty. Wybierz inne daty.",
-					);
-					return;
-				}
-
-				if (response.status === 400) {
-					const { error } = await response.json();
-					alert(error || "Nieprawidłowe dane rezerwacji.");
-					return;
-				}
-
-				if (!response.ok) {
-					alert("Wystąpił błąd podczas tworzenia rezerwacji. Spróbuj ponownie.");
-					return;
-				}
-
-				const { reservationId } = await response.json();
-				console.log("RESERVATION CREATED: " + reservationId);
-
-				bookingForm.reset();
-				document.getElementById("myReservation").click();
 			});
+		} else {
+			console.error("[booking] initBookingForm — brak #bookingForm w DOM");
 		}
 	}
 }

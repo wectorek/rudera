@@ -6,15 +6,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 // Klucz apiKey w konfiguracji Firebase Web SDK nie jest "tajny" w sensie
 // autoryzacji (zawsze widoczny w devtools klienta), ale mimo to trzymamy go
-// poza repo i ładujemy w runtime z Pages Function `/api/firebase-config`
-// (functions/api/firebase-config.js), która czyta zmienną `FIREBASE_API_KEY`.
-//
-// Ustawianie wartości — analogicznie jak w repo rudera-backend:
-//  - lokalnie: plik `.dev.vars` w korzeniu repo (gitignorowany), na wzór
-//    `.dev.vars.example`, odczytywany automatycznie przez
-//    `wrangler pages dev src` (patrz README/skrypt "dev").
-//  - na produkcji: Cloudflare Pages -> Settings -> Environment variables ->
-//    dodaj sekret `FIREBASE_API_KEY`.
+// poza repo i ładujemy w runtime z GET `/api/firebase-config`:
+//  - produkcja / `npm run dev`: Pages Function `functions/api/firebase-config.js`
+//    (FIREBASE_API_KEY z env CF / lokalnego `.dev.vars`)
+//  - Five Server: middleware w `fiveserver.config.js` (też czyta `.dev.vars`)
 async function getFirebaseApiKey() {
 	const response = await fetch("/api/firebase-config");
 	if (!response.ok) {

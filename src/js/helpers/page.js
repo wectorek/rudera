@@ -22,16 +22,22 @@ const subpageCache = {};
 async function loadSubpageContent(subpageId) {
 	// Jeśli już jest w cache, zwróć z cache
 	if (subpageCache[subpageId]) {
+		console.log("[page] loadSubpageContent cache hit:", subpageId);
 		return subpageCache[subpageId];
 	}
 
-	// Załaduj z pliku w folderze pages
-	const response = await fetch(`/pages/${subpageId}.html`);
+	const url = `/pages/${subpageId}.html`;
+	console.log("[page] loadSubpageContent fetch:", url);
+	const response = await fetch(url);
+	console.log("[page] loadSubpageContent status:", response.status, subpageId);
+	if (!response.ok) {
+		throw new Error(`Nie udało się załadować podstrony ${subpageId} (${response.status})`);
+	}
 	const html = await response.text();
-	
+
 	// Zapisz w cache
 	subpageCache[subpageId] = html;
-	
+
 	return html;
 }
 
@@ -154,7 +160,11 @@ export async function showSubpage(
 
 export function initAvailabilityBar() {
 	const btn = document.getElementById("checkAvailability");
-	if (!btn) return;
+	if (!btn) {
+		console.warn("[availability] brak przycisku #checkAvailability — init pominięty");
+		return;
+	}
+	console.log("[availability] initAvailabilityBar — listener podpięty");
 
 	const quickCheckIn = document.getElementById("quickCheckIn");
 	const quickCheckOut = document.getElementById("quickCheckOut");
@@ -169,58 +179,97 @@ export function initAvailabilityBar() {
 	});
 
 	btn.addEventListener("click", async () => {
-		console.log("Sprawdzanie dostępności...");
-		const checkIn = document.getElementById("quickCheckIn").value;
-		const checkOut = document.getElementById("quickCheckOut").value;
-		const adults = document.getElementById("quickAdults").value;
-		const children = document.getElementById("quickChildren").value;
+		console.log("[availability] klik: Sprawdź dostępność");
+		try {
+			const checkIn = document.getElementById("quickCheckIn")?.value;
+			const checkOut = document.getElementById("quickCheckOut")?.value;
+			const adults = document.getElementById("quickAdults")?.value;
+			const children = document.getElementById("quickChildren")?.value;
+			console.log("[availability] dane z paska:", { checkIn, checkOut, adults, children });
 
-		if (!checkIn || !checkOut || adults === "" || children === "") {
-			alert("Wypełnij wszystkie pola.");
-			return;
-		}
+			if (!checkIn || !checkOut || adults === "" || children === "") {
+				console.warn("[availability] brakujące pola — przerwano");
+				alert("Wypełnij wszystkie pola.");
+				return;
+			}
 
-		if (!Reservation.isValidDateRange(checkIn, checkOut)) {
-			alert("Data wyjazdu musi być późniejsza niż data przyjazdu.");
-			return;
-		}
+			if (!Reservation.isValidDateRange(checkIn, checkOut)) {
+				console.warn("[availability] nieprawidłowy zakres dat");
+				alert("Data wyjazdu musi być późniejsza niż data przyjazdu.");
+				return;
+			}
 
-		const heroBookingElement = document.getElementById("hero-booking");
+			const heroBookingElement = document.getElementById("hero-booking");
+			if (!heroBookingElement) {
+				console.error("[availability] brak elementu #hero-booking");
+				return;
+			}
 
-		if (!heroBookingElement.innerHTML.trim()) {
-			const html = await loadSubpageContent("booking");
-			heroBookingElement.innerHTML = html;
-			heroBookingInitialized = false;
-		}
+			if (!heroBookingElement.innerHTML.trim()) {
+				console.log("[availability] ładowanie booking.html do #hero-booking...");
+				const html = await loadSubpageContent("booking");
+				console.log("[availability] booking.html załadowany, długość HTML:", html?.length);
+				heroBookingElement.innerHTML = html;
+				heroBookingInitialized = false;
+			} else {
+				console.log("[availability] #hero-booking już ma zawartość");
+			}
 
-		if (!heroBookingInitialized) {
-			Reservation.initBookingForm();
-			heroBookingInitialized = true;
-		}
+			if (!heroBookingInitialized) {
+				console.log("[availability] initBookingForm...");
+				Reservation.initBookingForm();
+				heroBookingInitialized = true;
+			}
 
-		await initReservationCalendar();
+			console.log("[availability] initReservationCalendar...");
+			await initReservationCalendar();
 
-		document.getElementById("checkIn").value = checkIn;
-		document.getElementById("checkOut").value = checkOut;
-		document.getElementById("adults").value = adults;
-		document.getElementById("children").value = children;
-		Reservation.syncCheckoutMinDate();
+			const checkInEl = document.getElementById("checkIn");
+			const checkOutEl = document.getElementById("checkOut");
+			const adultsEl = document.getElementById("adults");
+			const childrenEl = document.getElementById("children");
+			console.log("[availability] pola formularza:", {
+				checkIn: !!checkInEl,
+				checkOut: !!checkOutEl,
+				adults: !!adultsEl,
+				children: !!childrenEl,
+			});
 
-		const available = await isDateRangeAvailable(checkIn, checkOut);
-		Reservation.updateBookingPricePreview();
+			if (!checkInEl || !checkOutEl || !adultsEl || !childrenEl) {
+				console.error("[availability] brak pól formularza rezerwacji w DOM");
+				return;
+			}
 
-		const heroContentEl = document.getElementById("hero-content");
-		if (heroContentEl) {
-			heroContentEl.classList.remove("visible");
-		}
+			checkInEl.value = checkIn;
+			checkOutEl.value = checkOut;
+			adultsEl.value = adults;
+			childrenEl.value = children;
+			Reservation.syncCheckoutMinDate();
 
-		heroBookingElement.classList.add("visible");
-		heroBookingElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+			console.log("[availability] sprawdzanie isDateRangeAvailable...", { checkIn, checkOut });
+			const available = await isDateRangeAvailable(checkIn, checkOut);
+			console.log("[availability] wynik dostępności:", available);
 
-		if (!available) {
-			Reservation.showOccupiedPopup(
-				"Wybrany termin jest już zarezerwowany. Wybierz inne daty.",
-			);
+			Reservation.updateBookingPricePreview();
+
+			const heroContentEl = document.getElementById("hero-content");
+			if (heroContentEl) {
+				heroContentEl.classList.remove("visible");
+			}
+
+			heroBookingElement.classList.add("visible");
+			heroBookingElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+			console.log("[availability] formularz pokazany (#hero-booking.visible)");
+
+			if (!available) {
+				console.log("[availability] termin zajęty — pokazuję popup");
+				Reservation.showOccupiedPopup(
+					"Wybrany termin jest już zarezerwowany. Wybierz inne daty.",
+				);
+			}
+		} catch (error) {
+			console.error("[availability] błąd w handlerze Sprawdź dostępność:", error);
+			alert("Wystąpił błąd podczas sprawdzania dostępności. Sprawdź konsolę.");
 		}
 	});
 }

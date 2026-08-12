@@ -7,6 +7,8 @@ const defaultApiBaseUrl = isLocalHost ? localApiBaseUrl : productionApiBaseUrl;
 export const apiBaseUrl =
 	window.RUDERA_API_URL?.replace(/\/$/, "") ?? defaultApiBaseUrl;
 
+console.log("[api] apiBaseUrl:", apiBaseUrl, { isLocalHost, hostname: window.location.hostname });
+
 export function buildApiUrl(path) {
 	const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 	return `${apiBaseUrl}${normalizedPath}`;

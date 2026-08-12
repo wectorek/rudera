@@ -15,34 +15,48 @@ function buildReservedSet(dates) {
 }
 
 export async function fetchReservedSet({ force = false } = {}) {
-	if (cachedReservedSet && !force) return cachedReservedSet;
+	if (cachedReservedSet && !force) {
+		console.log("[calendar] fetchReservedSet — cache hit, size:", cachedReservedSet.size);
+		return cachedReservedSet;
+	}
+
+	const url = buildApiUrl("/reserved-dates");
+	console.log("[calendar] fetchReservedSet — GET", url, { force });
 
 	try {
-		const response = await fetch(buildApiUrl("/reserved-dates"));
+		const response = await fetch(url);
+		console.log("[calendar] /reserved-dates status:", response.status);
 		if (response.ok) {
 			const dates = await response.json();
+			console.log("[calendar] /reserved-dates liczba przedziałów:", dates?.length, dates);
 			cachedReservedSet = buildReservedSet(dates);
+			console.log("[calendar] reservedSet size:", cachedReservedSet.size);
 			return cachedReservedSet;
 		}
-		console.warn("Kalendarz: serwer zwrócił błąd", response.status);
+		console.warn("[calendar] serwer zwrócił błąd", response.status);
 	} catch (err) {
-		console.warn("Kalendarz: nie można pobrać zarezerwowanych dat:", err.message);
+		console.warn("[calendar] nie można pobrać zarezerwowanych dat:", err);
 	}
 
 	cachedReservedSet = new Set();
+	console.log("[calendar] fallback — pusty reservedSet");
 	return cachedReservedSet;
 }
 
 export async function isDateRangeAvailable(arrivalDate, departureDate) {
+	console.log("[calendar] isDateRangeAvailable:", { arrivalDate, departureDate });
 	const reservedSet = await fetchReservedSet({ force: true });
 	const start = new Date(arrivalDate);
 	const end = new Date(departureDate);
 
 	for (const d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
-		if (reservedSet.has(d.toISOString().split("T")[0])) {
+		const day = d.toISOString().split("T")[0];
+		if (reservedSet.has(day)) {
+			console.log("[calendar] kolizja w dniu:", day);
 			return false;
 		}
 	}
+	console.log("[calendar] zakres wolny");
 	return true;
 }
 
@@ -87,12 +101,18 @@ function renderCalendar(reservedSet, year, month) {
 }
 
 export async function initReservationCalendar() {
+	console.log("[calendar] initReservationCalendar start");
 	const reservedSet = await fetchReservedSet({ force: true });
 
 	let currentYear = new Date().getFullYear();
 	let currentMonth = new Date().getMonth();
 
+	const grid = document.getElementById("calGrid");
+	const label = document.getElementById("calMonthLabel");
+	console.log("[calendar] elementy DOM:", { calGrid: !!grid, calMonthLabel: !!label });
+
 	renderCalendar(reservedSet, currentYear, currentMonth);
+	console.log("[calendar] initReservationCalendar done");
 
 	const prevBtn = document.getElementById("calPrev");
 	const nextBtn = document.getElementById("calNext");

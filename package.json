@@ -5,7 +5,7 @@
     "wrangler": "^4.113.0"
   },
   "scripts": {
-    "dev": "wrangler pages dev src",
+    "dev": "wrangler pages dev src --port 5501",
     "deploy": "wrangler pages deploy src"
   }
 }
