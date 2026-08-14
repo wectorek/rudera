@@ -1,4 +1,4 @@
-import { getPageFromURL, showSubpage, initAvailabilityBar } from "../js/helpers/page.js";
+import { getPageFromURL, showSubpage, initAvailabilityBar, updateUnderline } from "../js/helpers/page.js";
 
 export function initApp() {
 	const subpages = {
@@ -61,6 +61,11 @@ export function initApp() {
 			currentButton = await showSubpage(button, currentButton);
 		});
 	}
+
+	window.addEventListener("resize", () => {
+		const active = document.querySelector("#navigation .navigation-button.current-button");
+		if (active) updateUnderline(active);
+	});
 
 	// Inicjalizacja pozycji linii przy starcie
 	window.addEventListener("load", async () => {

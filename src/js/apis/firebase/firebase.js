@@ -92,6 +92,7 @@ onAuthStateChanged(auth, (user) => {
 		if (myResBtnLabel) {
 			myResBtnLabel.textContent = isAdmin(user) ? "Zarządzanie rezerwacjami" : "Moja rezerwacja";
 		}
+		window.dispatchEvent(new Event("resize"));
 		const availabilityBar = document.getElementById("availability-bar");
 		if (availabilityBar) {
 			availabilityBar.style.display = isAdmin(user) ? "none" : "";
@@ -106,6 +107,7 @@ onAuthStateChanged(auth, (user) => {
 		loginBtn.style.display = "";
 		logoutBtn.style.display = "none";
 		document.getElementById("myReservation").style.display = "none";
+		window.dispatchEvent(new Event("resize"));
 		const availabilityBar = document.getElementById("availability-bar");
 		if (availabilityBar) availabilityBar.style.display = "";
 	}

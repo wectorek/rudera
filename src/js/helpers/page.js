@@ -73,37 +73,71 @@ export function updateUnderline(button) {
 	underline.style.width = rect.width + "px";
 }
 
+function waitMs(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function nextFrame() {
+	return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+
+async function fadeOutHeroPanels() {
+	const heroContentElement = document.getElementById("hero-content");
+	const heroBookingElement = document.getElementById("hero-booking");
+	const wasVisible =
+		heroContentElement?.classList.contains("visible") ||
+		heroBookingElement?.classList.contains("visible");
+
+	heroContentElement?.classList.remove("visible");
+	heroBookingElement?.classList.remove("visible");
+
+	if (wasVisible) {
+		await waitMs(280);
+	}
+
+	if (heroBookingElement) {
+		heroBookingElement.innerHTML = "";
+		heroBookingInitialized = false;
+	}
+}
+
+async function fadeInHeroContent() {
+	const heroContentElement = document.getElementById("hero-content");
+	if (!heroContentElement) return;
+	heroContentElement.classList.remove("visible");
+	await nextFrame();
+	await nextFrame();
+	heroContentElement.classList.add("visible");
+}
+
 export async function showSubpage(
 	subpage,
 	currentButton,
 	updateURL = true,
 ) {
-	if (currentButton) currentButton.classList.remove("current-button");
 	const newButton = subpage;
-	newButton.classList.add("current-button");
-
-	// Przesuń linię
-	updateUnderline(newButton);
-
 	const subpageId = newButton.id;
 	const heroContentElement = document.getElementById("hero-content");
+	const switchingTabs = currentButton && currentButton !== newButton;
 
-	// Ukryj hero-booking przy nawigacji do innej podstrony
-	const heroBookingElement = document.getElementById("hero-booking");
-	if (heroBookingElement) {
-		heroBookingElement.classList.remove("visible");
-		heroBookingElement.innerHTML = "";
-		heroBookingInitialized = false;
+	document.querySelectorAll("#navigation .navigation-button").forEach((btn) => {
+		btn.classList.remove("current-button");
+	});
+	newButton.classList.add("current-button");
+	updateUnderline(newButton);
+
+	if (!switchingTabs && heroContentElement?.classList.contains("visible") && updateURL) {
+		return newButton;
 	}
 
-	// Aktualizuj URL
 	if (updateURL) {
 		const newURL = `${window.location.pathname}?page=${subpageId}`;
 		window.history.pushState({ page: subpageId }, "", newURL);
 	}
 
+	await fadeOutHeroPanels();
+
 	if (subpageId === "booking") {
-		// Załaduj formularz rezerwacji do hero-content
 		if (!heroContentElement.querySelector("#bookingForm")) {
 			const html = await loadSubpageContent("booking");
 			heroContentElement.innerHTML = html;
@@ -114,15 +148,12 @@ export async function showSubpage(
 			bookingFormInitialized = true;
 		}
 		await initReservationCalendar();
-		heroContentElement.classList.add("visible");
+		await fadeInHeroContent();
 	} else if (subpageId === "myReservation") {
-		// Świeża kopia — reset widoku
 		const response = await fetch("/pages/myReservation.html");
 		heroContentElement.innerHTML = await response.text();
 		initCopyButton();
-		heroContentElement.classList.add("visible");
 
-		// Reset flag — booking musi załadować się od nowa po powrocie
 		bookingContentLoaded = false;
 		bookingFormInitialized = false;
 
@@ -148,11 +179,11 @@ export async function showSubpage(
 			});
 		}
 		initReservationCalendar();
+		await fadeInHeroContent();
 	} else {
-		// Zwykłe podstrony
 		const content = await loadSubpageContent(subpageId);
 		heroContentElement.innerHTML = content;
-		heroContentElement.classList.add("visible");
+		await fadeInHeroContent();
 	}
 
 	return newButton;
